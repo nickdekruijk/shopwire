@@ -1,0 +1,33 @@
+{
+    "name": "nickdekruijk/shopwire",
+    "description": "A simple, easy to implement shopping cart and checkout package for Laravel 9 using Livewire.",
+    "keywords": ["webshop", "shopwire", "laravel", "shop", "cart", "checkout", "livewire", "ecommerce"],
+    "license": "MIT",
+    "support": {
+        "issues": "https://github.com/nickdekruijk/shopwire/issues",
+        "source": "https://github.com/nickdekruijk/shopwire"
+    },
+    "authors": [{
+        "name": "Nick de Kruijk",
+        "email": "git@nickdekruijk.nl"
+    }],
+    "require": {
+        "php": "^8.0",
+        "laravel/framework": "^9.0",
+        "livewire/livewire": "^2.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "NickDeKruijk\\Shopwire\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "NickDeKruijk\\Shopwire\\ShopwireServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
