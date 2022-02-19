@@ -27,7 +27,7 @@
                 "NickDeKruijk\\Shopwire\\ShopwireServiceProvider"
             ],
             "aliases": {
-                "Webshop": "NickDeKruijk\\Shopwire\\ShopwireFacade"
+                "Shopwire": "NickDeKruijk\\Shopwire\\ShopwireFacade"
             }
         }
     },
