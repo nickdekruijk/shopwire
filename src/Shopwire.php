@@ -16,6 +16,6 @@ class Shopwire
      */
     public static function money($amount)
     {
-        return config('shopwire.currency.symbol') . number_format($amount, config('shopwire.currency.decimals'), trans('shopwire::cart.dec_point'), trans('shopwire::cart.thousands_sep'));
+        return config('shopwire.currency.symbol') . number_format($amount, config('shopwire.currency.decimals'), trans('shopwire::cart.decimal_point'), trans('shopwire::cart.thousands_seperator'));
     }
 }
