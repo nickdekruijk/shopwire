@@ -16,6 +16,9 @@ class ShopwireServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__ . '/config.php' => config_path('shopwire.php'),
         ], 'config');
+
+        $this->loadTranslationsFrom(__DIR__ . '/lang', 'shopwire');
+
         if (config('shopwire.migration')) {
             $this->loadMigrationsFrom(__DIR__ . '/migrations/');
         }
