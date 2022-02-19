@@ -25,7 +25,10 @@
         "laravel": {
             "providers": [
                 "NickDeKruijk\\Shopwire\\ShopwireServiceProvider"
-            ]
+            ],
+            "aliases": {
+                "Webshop": "NickDeKruijk\\Shopwire\\ShopwireFacade"
+            }
         }
     },
     "minimum-stability": "dev",

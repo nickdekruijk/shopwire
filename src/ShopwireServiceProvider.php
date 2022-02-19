@@ -29,5 +29,10 @@ class ShopwireServiceProvider extends ServiceProvider
     public function register()
     {
         $this->mergeConfigFrom(__DIR__ . '/config.php', 'shopwire');
+
+        // Register the main class to use with the facade
+        $this->app->singleton('nickdekruijk-shopwire', function () {
+            return new Shopwire;
+        });
     }
 }

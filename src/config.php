@@ -26,4 +26,16 @@ return [
     */
     'cache_prefix' => 'shopwire_',
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | currency
+    |--------------------------------------------------------------------------
+    | The currency to use during checkout and Shopwire::money() helper
+    */
+    'currency' => [
+        'code' => 'EUR',
+        'symbol' => '€ ',
+        'decimals' => 2,
+    ],
 ];
