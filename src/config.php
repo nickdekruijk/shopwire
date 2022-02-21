@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Product;
+
 return [
 
     /*
@@ -26,6 +28,13 @@ return [
     */
     'cache_prefix' => 'shopwire_',
 
+    /*
+    |--------------------------------------------------------------------------
+    | product_model
+    |--------------------------------------------------------------------------
+    | The model to use for products
+    */
+    'product_model' => Product::class,
 
     /*
     |--------------------------------------------------------------------------
@@ -38,4 +47,19 @@ return [
         'symbol' => '€ ',
         'decimals' => 2,
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | product_columns
+    |--------------------------------------------------------------------------
+    | Product columns used for checkout
+    */
+    'product_columns' => [
+        'id' => 'id',
+        'price' => 'price',
+        'vat' => 'vat_id',    // Must match id from shopwire_vats table
+        'stock' => 'stock',   // Will decrease after payment is successful 
+        'weight' => 'weight', // Weight in grams, used to calculate shipping
+    ],
+
 ];

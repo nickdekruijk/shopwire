@@ -3,6 +3,9 @@
 namespace NickDeKruijk\Shopwire;
 
 use Illuminate\Support\ServiceProvider;
+use Livewire\Livewire;
+use NickDeKruijk\Shopwire\Livewire\AddToCart;
+use NickDeKruijk\Shopwire\Livewire\Cart;
 
 class ShopwireServiceProvider extends ServiceProvider
 {
@@ -13,6 +16,8 @@ class ShopwireServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        $this->loadViewsFrom(__DIR__ . '/views', 'shopwire');
+
         $this->publishes([
             __DIR__ . '/config.php' => config_path('shopwire.php'),
         ], 'config');
@@ -22,6 +27,9 @@ class ShopwireServiceProvider extends ServiceProvider
         if (config('shopwire.migration')) {
             $this->loadMigrationsFrom(__DIR__ . '/migrations/');
         }
+
+        Livewire::component('shopwire-add', AddToCart::class);
+        Livewire::component('shopwire-cart', Cart::class);
     }
 
     /**
