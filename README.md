@@ -15,15 +15,14 @@ php artisan migrate
 ```
 
 ## Prepare your Product model
-Add Vat relationship:
+Add ShopwireProduct trait:
 ```php
-use NickDeKruijk\Shopwire\Models\Vat;
-
-public function vat()
+use NickDeKruijk\Shopwire\Traits\ShopwireProduct;
+class Product extends Model
 {
-    return $this->belongsTo(Vat::class);
-}
+    use ShopwireProduct;
 ```
+If you model is different from the default (App\Models\Product), you can change the model name in the config file.
 
 ## Some seeds with data to start with
 Dutch VAT

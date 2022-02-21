@@ -23,27 +23,27 @@ class CartItem extends Model
         return $this->belongsTo(config('shopwire.product_model'));
     }
 
-    public function getPriceAttribute($value)
-    {
-        if (config('shopwire.product_option_model') && $this->option && config('shopwire.product_option_columns.price')) {
-            $price = ['price' => $this->option[config('shopwire.product_option_columns.price')] ?: $this->product[config('shopwire.product_columns.price')]];
-        } else {
-            $price = ['price' => $this->product[config('shopwire.product_columns.price')]];
-        }
+    // public function option()
+    // {
+    //     return $this->belongsTo(config('shopwire.product_option_model'), 'product_option_id', config('shopwire.product_option_columns.product_id'));
+    // }
 
-        $price['vat_included'] = $this->product->vat->included;
-        $price['vat_rate'] = $this->product->vat->rate;
+    // public function getWeightAttribute($value)
+    // {
+    //     if (config('shopwire.product_option_model') && $this->option && config('shopwire.product_option_columns.weight')) {
+    //         return $this->option[config('shopwire.product_option_columns.weight')] ?: $this->product[config('shopwire.product_columns.weight')];
+    //     } else {
+    //         return $this->product[config('shopwire.product_columns.weight')];
+    //     }
+    // }
 
-        if ($price['vat_included']) {
-            $price['price_including_vat'] = $price['price'];
-            $price['price_excluding_vat'] = round($price['price'] / ($price['vat_rate'] / 100 + 1), 2);
-            $price['price_vat'] = $price['price_including_vat'] - $price['price_excluding_vat'];
-        } else {
-            $price['price_including_vat'] = round($price['price'] * ($price['vat_rate'] / 100 + 1), 2);
-            $price['price_excluding_vat'] = $price['price'];
-            $price['price_vat'] = $price['price_including_vat'] - $price['price_excluding_vat'];
-        }
+    // public function getTitleAttribute($value)
+    // {
+    //     return $this->product[config('shopwire.product_columns.title')] . (config('shopwire.product_option_model') && $this->option && $this->option[config('shopwire.product_option_columns.title')] ? ' (' . $this->option[config('shopwire.product_option_columns.title')] . ')' : '');
+    // }
 
-        return (object) $price;
-    }
+    // public function getDescriptionAttribute($value)
+    // {
+    //     return $this->product[config('shopwire.product_columns.description')] . (config('shopwire.product_option_model') && $this->option && $this->option[config('shopwire.product_option_columns.description')] ? ' (' . $this->option[config('shopwire.product_option_columns.description')] . ')' : '');
+    // }
 }
