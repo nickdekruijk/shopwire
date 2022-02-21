@@ -4,7 +4,15 @@
     </div>
     <label class="quantity">
         @lang('shopwire::cart.quantity')
-        <input type="number" wire:model="quantity" min="1" size="3">
+        <input type="number" wire:model="quantity" min="{{ $cart_quantity ? 0 : 1 }}" size="3">
     </label>
-    <button class="button" wire:click="add">@lang('shopwire::cart.add_to_cart')</button>
+    <div class="buttons">
+        @if ($cart_quantity && $cart_quantity == $quantity)
+            <a class="button" href="{{ config('shopwire.checkout_url') }}">@lang('shopwire::cart.checkout')</a>
+        @elseif ($cart_quantity)
+            <button class="button" wire:click="add">@lang('shopwire::cart.update_cart')</button>
+        @else
+            <button class="button" wire:click="add">@lang('shopwire::cart.add_to_cart')</button>
+        @endif
+    </div>
 </div>

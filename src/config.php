@@ -62,4 +62,12 @@ return [
         'weight' => 'weight', // Weight in grams, used to calculate shipping
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | checkout_url
+    |--------------------------------------------------------------------------
+    | The url to go to when customer clicks on checkout
+    */
+    'checkout_url' => Route::has('shopwire.checkout') ? route('shopwire.checkout') : '/checkout',
+
 ];
