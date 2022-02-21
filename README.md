@@ -14,6 +14,17 @@ Afterwards run the migration command:
 php artisan migrate
 ```
 
+## Prepare your Product model
+Add Vat relationship:
+```php
+use NickDeKruijk\Shopwire\Models\Vat;
+
+public function vat()
+{
+    return $this->belongsTo(Vat::class);
+}
+```
+
 ## Some seeds with data to start with
 Dutch VAT
 `php artisan db:seed --class=NickDeKruijk\\Shopwire\\Seeds\\VatDutch`
