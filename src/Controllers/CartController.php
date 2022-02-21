@@ -66,7 +66,7 @@ class CartController extends Controller
      * Add a product to the cart.
      *
      * @param  integer $product_id
-     * @param  integer $quantity
+     * @param  float $quantity
      * @param  integer $product_option_id
      * @return Response
      */
