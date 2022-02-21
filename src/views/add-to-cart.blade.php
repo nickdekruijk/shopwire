@@ -3,7 +3,7 @@
         {{ Shopwire::money($product->price) }}
     </div>
     <label class="quantity">
-        @lang('shopwire::cart.quantity')
+        <span>@lang('shopwire::cart.quantity')</span>
         <input type="number" wire:model="quantity" min="{{ $cart_quantity ? 0 : 1 }}" size="3">
     </label>
     <div class="buttons">
