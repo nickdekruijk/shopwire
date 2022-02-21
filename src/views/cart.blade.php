@@ -1,7 +1,7 @@
-<a class="shopwire-cart" href="{{ config('shopwire.checkout_url') }}">
+<a class="shopwire-cart shopwire-cart-{{ $count }}" href="{{ config('shopwire.checkout_url') }}">
     @if ($count)
-        <span class="shopwire-count">{{ $count }}</span>
+        <span class="shopwire-cart-count">{{ $count }}</span>
     @else
-        <span class="shopwire-empty"></span>  
+        <span class="shopwire-cart-empty">@lang('shopwire::cart.empty')</span>  
     @endif
 </a>
