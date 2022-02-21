@@ -22,7 +22,9 @@ class Cart extends Component
     public function updateCount()
     {
         $items = CartController::getItems();
-        $this->count = $this->unique ? $items->count_unique : $items->count;
+        if ($items) {
+            $this->count = $this->unique ? $items->count_unique : $items->count;
+        }
     }
 
     public function render()
