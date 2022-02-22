@@ -28,7 +28,7 @@ class AddToCart extends Component
         if ($this->quantity == 0 && $this->cart_quantity == 0) {
             $this->quantity = 1;
         }
-        CartController::add($this->product, ($this->quantity - $this->cart_quantity) ?: 1);
+        CartController::update($this->product, $this->quantity ?: 1);
         $this->cart_quantity = $this->quantity;
         $this->emit('cartUpdate');
     }

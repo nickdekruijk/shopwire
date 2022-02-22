@@ -82,14 +82,28 @@ class CartController extends Controller
     }
 
     /**
-     * Add a product to the cart.
+     * Update or add a product to the cart with a fixed quantity
      *
      * @param  integer $product_id
      * @param  float $quantity
      * @param  integer $product_option_id
      * @return Response
      */
-    public static function add($product, $quantity = 1, $product_option_id = null)
+    public static function update($product, $quantity = 1, $product_option_id = null)
+    {
+        return self::add($product, $quantity, $product_option_id, false);
+    }
+
+    /**
+     * Add a product to the cart.
+     *
+     * @param  integer $product_id
+     * @param  float $quantity
+     * @param  integer $product_option_id
+     * @param  bool $incremental When true, increment the quantity of the item if it already exists in the cart, else set fixed quantity
+     * @return Response
+     */
+    public static function add($product, $quantity = 1, $product_option_id = null, $incremental = true)
     {
         // Get the current cart, create if needed
         $cart = self::currentCart(true);
@@ -98,7 +112,7 @@ class CartController extends Controller
         $cart_item = $cart->items()->where('product_id', $product->id)->where('product_option_id', $product_option_id)->first();
         if ($cart_item) {
             // Already in cart, increase quantity
-            $cart_item->quantity = $cart_item->quantity + $quantity;
+            $cart_item->quantity = $incremental ? $cart_item->quantity + $quantity : $quantity;
         } else {
             // Create a new one instead
             $cart_item = new CartItem;
