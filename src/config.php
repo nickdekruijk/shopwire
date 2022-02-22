@@ -56,6 +56,7 @@ return [
     */
     'product_columns' => [
         'id' => 'id',
+        'title' => 'title',
         'price' => 'price',
         'vat' => 'vat_id',    // Must match id from shopwire_vats table
         'stock' => 'stock',   // Will decrease after payment is successful 
