@@ -3,9 +3,21 @@
 namespace NickDeKruijk\Shopwire;
 
 use Log;
+use NickDeKruijk\Shopwire\Controllers\CartController;
 
 class Shopwire
 {
+    /**
+     * Return total count of items in the cart.
+     *
+     * @param  boolean $unique When true return total amount of unique items instead of adding all quantities together.
+     * @return integer
+     */
+    public static function count($unique = false)
+    {
+        return CartController::count($unique);
+    }
+
     /**
      * Return a formatted representation of an amount with currency symbol and decimals.
      *

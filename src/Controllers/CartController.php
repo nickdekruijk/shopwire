@@ -63,6 +63,25 @@ class CartController extends Controller
     }
 
     /**
+     * Return total count of items in the cart.
+     *
+     * @param  boolean $unique When true return total amount of unique items instead of adding all quantities together.
+     * @return integer
+     */
+    public static function count($unique = false)
+    {
+        $cart = self::currentCart();
+        if (!$cart) {
+            return 0;
+        }
+        $count = 0;
+        foreach ($cart->items as $item) {
+            $count += $unique ? ($item->quantity == 0 ? 0 : 1) : $item->quantity;
+        }
+        return $count;
+    }
+
+    /**
      * Add a product to the cart.
      *
      * @param  integer $product_id

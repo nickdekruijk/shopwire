@@ -21,10 +21,7 @@ class Cart extends Component
 
     public function updateCount()
     {
-        $items = CartController::getItems();
-        if ($items) {
-            $this->count = $this->unique ? $items->count_unique : $items->count;
-        }
+        $this->count = CartController::count($this->unique);
     }
 
     public function render()
