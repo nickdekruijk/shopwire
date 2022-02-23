@@ -182,7 +182,7 @@ class CartController extends Controller
             $response->statistics['amount_excluding_vat'] += $item->product->shopwire_price->price_excluding_vat * $item->quantity;
             $response->statistics['amount_vat'][$item->product->shopwire_price->vat_rate] = ($response->amount_vat[$item->product->shopwire_price->vat_rate] ?? 0) + ($item->product->shopwire_price->price_including_vat - $item->product->shopwire_price->price_excluding_vat) * $item->quantity;
 
-            if ($item->product->shopwire_price->vat_rate > $max_vat_rate) {
+            if ($item->quantity > 0 && $item->product->shopwire_price->vat_rate > $max_vat_rate) {
                 $max_vat_rate = $item->product->shopwire_price->vat_rate;
             }
             $response->statistics['weight'] += $item->weight * $item->quantity;;
