@@ -29,7 +29,7 @@ class CartController extends Controller
             }
         }
 
-        // Secondly check if there the current session_id has a cart saved
+        // Secondly, check if there the current session_id has a cart saved
         $cart = Cart::where('session_id', session()->getId())->latest()->first();
         if ($cart) {
             // Found it, store it in session and return it
@@ -37,7 +37,7 @@ class CartController extends Controller
             return $cart;
         }
 
-        // Thirdly check if the current user has a cart
+        // Thirdly, check if the current user has a cart
         if (Auth::check()) {
             $cart = Cart::where('user_id', Auth::user()->id)->latest()->first();
             if ($cart) {
