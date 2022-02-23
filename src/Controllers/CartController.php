@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Auth;
 use NickDeKruijk\Shopwire\Models\Cart;
 use NickDeKruijk\Shopwire\Models\CartItem;
+use Stevebauman\Location\Facades\Location;
 
 class CartController extends Controller
 {
@@ -54,6 +55,8 @@ class CartController extends Controller
             if (Auth::check()) {
                 $cart->user_id = Auth::user()->id;
             }
+            $cart->country_code = Location::get()->countryCode;
+
             $cart->save();
             // Store the id in the session for performance
             session([$session_cart_id => $cart->id]);

@@ -14,7 +14,8 @@
     "require": {
         "php": "^8.0",
         "laravel/framework": "^9.0",
-        "livewire/livewire": "^2.1"
+        "livewire/livewire": "^2.1",
+        "stevebauman/location": "^6.3"
     },
     "autoload": {
         "psr-4": {
