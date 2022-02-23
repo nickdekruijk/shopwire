@@ -25,6 +25,9 @@ class AddToCart extends Component
 
     public function add()
     {
+        if ($this->quantity < 0) {
+            $this->quantity = 0;
+        }
         if ($this->quantity == 0 && $this->cart_quantity == 0) {
             $this->quantity = 1;
         }
