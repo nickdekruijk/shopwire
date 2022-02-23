@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Auth;
 use NickDeKruijk\Shopwire\Models\Cart;
 use NickDeKruijk\Shopwire\Models\CartItem;
+use NickDeKruijk\Shopwire\Models\ShippingRate;
 use Stevebauman\Location\Facades\Location;
 
 class CartController extends Controller
@@ -189,7 +190,58 @@ class CartController extends Controller
 
             $response->statistics['count'] += $item->quantity;
             $response->statistics['count_unique']++;
+        }
 
+        // Fetch all available shipping rates
+        $shipping_rates = ShippingRate::valid($response->statistics['amount_including_vat'], $response->statistics['weight'], $cart->country_code)->get();
+
+        // Find selected shipping rate and generate the options if available
+        $shipping_rate = null;
+        $shipping_options = [];
+        if ($shipping_rates->count() == 1) {
+            $shipping_rate = $shipping_rates->first();
+            $shipping_options[$shipping_rate->id] = $shipping_rate->toArray();
+        } elseif ($shipping_rates->count() > 1) {
+            foreach ($shipping_rates as $rate) {
+                $shipping_options[$rate->id] = $rate->toArray();
+                if ($cart->shipping_rate_id == $rate->id) {
+                    $shipping_rate = $rate;
+                }
+            }
+        }
+        $response->shipping_options = $shipping_options;
+
+        // Create shipping item and calculate VAT
+        if ($shipping_rate) {
+            $shipping = (object) [
+                'id' => null,
+                'product_id' => null,
+                'title' => $shipping_rate->title,
+                'price' => (object) [
+                    'price' => $shipping_rate->rate,
+                    'vat_included' => $shipping_rate->vat_included,
+                    'vat_rate' => $max_vat_rate,
+                    'price_including_vat' => null,
+                    'price_excluding_vat' => null,
+                    'price_vat' => null,
+                ],
+                'quantity' => 1,
+            ];
+
+            if ($shipping->price->vat_included) {
+                $shipping->price->price_including_vat = $shipping_rate->rate;
+                $shipping->price->price_excluding_vat = round($shipping_rate->rate / ($max_vat_rate / 100 + 1), 2);
+            } else {
+                $shipping->price->price_including_vat = round($shipping_rate->rate * ($max_vat_rate / 100 + 1), 2);
+                $shipping->price->price_excluding_vat = $shipping_rate->rate;
+            }
+            $response->statistics['amount_vat'][$max_vat_rate] = ($response->statistics['amount_vat'][$max_vat_rate] ?? 0) + $shipping->price->price_including_vat - $shipping->price->price_excluding_vat;
+
+            $response->statistics['amount_including_vat'] += $shipping->price->price_including_vat;
+            $response->statistics['amount_excluding_vat'] += $shipping->price->price_excluding_vat;
+            $response->items[] = $shipping;
+        } else {
+            $response->items[] = 'select_shipping';
         }
 
         $response->items = collect($response->items);
