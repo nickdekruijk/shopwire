@@ -1,11 +1,28 @@
 <?php
 
 return [
+    'cart' => 'Winkelwagen',
+    'ship_to' => 'Verzenden naar',
+    'price' => 'Prijs',
     'quantity' => 'Aantal',
     'add_to_cart' => 'Toevoegen aan winkelwagen',
     'update_cart' => 'Winkelwagen bijwerken',
     'checkout' => 'Afrekenen',
+    'select_country' => 'Selecteer land',
     'empty' => 'Leeg',
+    'total' => 'Totaal',
+    'product' => 'Product',
     'decimal_point' => ',',
     'thousands_seperator' => '.',
+    'subtotal' => 'Subtotaal',
+    'subtotal_vatIncl' => 'Subtotaal inclusief BTW',
+    'subtotal_vatExcl' => 'Subtotaal exclusief BTW',
+    'weight' => 'Gewicht',
+    'total_to_pay' => 'Af te rekenen bedrag',
+    'no-shipping-possible' => 'Geen verzending mogelijk',
+    'select-shipping' => 'Selecteer verzendmethode',
+    'vat' => 'BTW',
+    'vatIncl' => 'Inclusief BTW',
+    'vatExcl' => 'Exclusief BTW',
+    'vat_toggle' => 'Toon inclusief BTW',
 ];

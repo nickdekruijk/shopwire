@@ -71,4 +71,109 @@ return [
     */
     'checkout_url' => Route::has('shopwire.checkout') ? route('shopwire.checkout') : '/checkout',
 
+    /*
+    |--------------------------------------------------------------------------
+    | checkout_form
+    |--------------------------------------------------------------------------
+    | The customer details to request during checkout
+    */
+    'checkout_form' => [
+        'company' => [
+            'label_nl' => 'Bedrijfsnaam',
+        ],
+        'firstname' => [
+            'validate' => 'required',
+            'label_nl' => 'Voornaam',
+        ],
+        'lastname' => [
+            'validate' => 'required',
+            'label_nl' => 'Achternaam',
+        ],
+        'address' => [
+            'validate' => 'required',
+            'label_nl' => 'Adres',
+        ],
+        'postcode' => [
+            'validate' => 'required',
+        ],
+        'city' => [
+            'validate' => 'required',
+            'label_nl' => 'Woonplaats',
+        ],
+        'country' => [
+            'type' => 'country',
+            'validate' => 'required',
+            'label_nl' => 'Land',
+        ],
+        'phone' => [
+            'validate' => 'nullable',
+            'label_nl' => 'Telefoon',
+        ],
+        'remarks' => [
+            'type' => 'textarea',
+            'validate' => 'nullable',
+            'label' => 'Any questions or remarks?',
+            'label_nl' => 'Heb je vragen of opmerkingen?',
+        ],
+        'billing' => [
+            'label' => 'Use different billing address?',
+            'label_nl' => 'Gebruik ander adres voor factuur?',
+            'type' => 'checkbox',
+            'toggle_group' => 'billing',
+        ],
+        'billing_company' => [
+            'validate' => 'required_with:billing',
+            'label' => 'Company',
+            'label_nl' => 'Bedrijfsnaam',
+            'group' => 'billing',
+        ],
+        'billing_firstname' => [
+            'validate' => 'required_with:billing',
+            'label' => 'Firstname',
+            'label_nl' => 'Voornaam',
+            'group' => 'billing',
+        ],
+        'billing_lastname' => [
+            'validate' => 'required_with:billing',
+            'label' => 'Lastname',
+            'label_nl' => 'Achternaam',
+            'group' => 'billing',
+        ],
+        'billing_address' => [
+            'validate' => 'required_with:billing',
+            'label' => 'Address',
+            'label_nl' => 'Adres',
+            'group' => 'billing',
+        ],
+        'billing_postcode' => [
+            'validate' => 'required_with:billing',
+            'label' => 'Postcode',
+            'group' => 'billing',
+        ],
+        'billing_city' => [
+            'validate' => 'required_with:billing',
+            'label' => 'City',
+            'label_nl' => 'Woonplaats',
+            'group' => 'billing',
+        ],
+        'billing_country' => [
+            'type' => 'country',
+            'validate' => 'required_with:billing',
+            'label_nl' => 'Land',
+            'group' => 'billing',
+        ],
+        'billing_email' => [
+            'type' => 'email',
+            'validate' => 'required_with:billing|email',
+            'label' => 'Email address',
+            'label_nl' => 'E-mailadres',
+            'group' => 'billing',
+        ],
+        'agree_with_terms' => [
+            'label' => 'Yes, I agree with the general terms and conditions.',
+            'label_nl' => 'Ja, ik ga akkoord met de algemene voorwaarden.',
+            'type' => 'checkbox',
+            'validate' => 'accepted',
+        ],
+    ],
 ];

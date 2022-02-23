@@ -6,6 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
 use NickDeKruijk\Shopwire\Livewire\AddToCart;
 use NickDeKruijk\Shopwire\Livewire\Cart;
+use NickDeKruijk\Shopwire\Livewire\Checkout;
 
 class ShopwireServiceProvider extends ServiceProvider
 {
@@ -30,6 +31,7 @@ class ShopwireServiceProvider extends ServiceProvider
 
         Livewire::component('shopwire-add', AddToCart::class);
         Livewire::component('shopwire-cart', Cart::class);
+        Livewire::component('shopwire-checkout', Checkout::class);
     }
 
     /**
