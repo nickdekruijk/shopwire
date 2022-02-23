@@ -28,6 +28,9 @@ If you model is different from the default (App\Models\Product), you can change 
 Dutch VAT
 `php artisan db:seed --class=NickDeKruijk\\Shopwire\\Seeds\\VatDutch`
 
+Dutch Shippment methods
+`php artisan db:seed --class=NickDeKruijk\\Shopwire\\Seeds\\ShippingDutch`
+
 ## License
 Shopwire is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
 
