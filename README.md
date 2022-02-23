@@ -24,6 +24,12 @@ class Product extends Model
 ```
 If you model is different from the default (App\Models\Product), you can change the model name in the config file.
 
+## Environment
+To enable automatic country detection, add the following to your .env file:
+```
+LOCATION_TESTING=false
+```
+
 ## Some seeds with data to start with
 Dutch VAT
 `php artisan db:seed --class=NickDeKruijk\\Shopwire\\Seeds\\VatDutch`
