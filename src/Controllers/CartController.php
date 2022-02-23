@@ -171,9 +171,10 @@ class CartController extends Controller
             $response->items[] = (object) [
                 'id' => $item->id,
                 'product_id' => $item->product_id,
-                'title' => $item->title,
-                'price' => $item->price,
-                'weight' => $item->weight,
+                'title' => $item->product->title,
+                'price' => $item->product->shopwire_price,
+                'weight' => $item->product->weight,
+                'product' => $item->product,
                 'quantity' => +$item->quantity,
             ];
 
