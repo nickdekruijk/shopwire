@@ -17,6 +17,8 @@ class CreateCartTable extends Migration
             $table->bigIncrements('id');
             $table->string('session_id')->index();
             $table->bigInteger('user_id')->unsigned()->nullable()->index();
+            $table->string('country_code')->nullable();
+            $table->foreignId('shipping_rate_id')->nullable()->constrained(config('shopwire.table_prefix') . 'shipping_rates');
             $table->timestamps();
         });
     }
