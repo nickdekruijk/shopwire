@@ -192,6 +192,7 @@ class CartController extends Controller
 
         }
 
+        $response->items = collect($response->items);
         return $response;
     }
 }
