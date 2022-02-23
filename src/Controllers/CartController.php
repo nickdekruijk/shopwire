@@ -92,9 +92,9 @@ class CartController extends Controller
      * @param  integer $product_option_id
      * @return Response
      */
-    public static function update($product, $quantity = 1, $product_option_id = null)
+    public static function update($product_id, $quantity = 1, $product_option_id = null)
     {
-        return self::add($product, $quantity, $product_option_id, false);
+        return self::add($product_id, $quantity, $product_option_id, false);
     }
 
     /**
@@ -106,13 +106,13 @@ class CartController extends Controller
      * @param  bool $incremental When true, increment the quantity of the item if it already exists in the cart, else set fixed quantity
      * @return Response
      */
-    public static function add($product, $quantity = 1, $product_option_id = null, $incremental = true)
+    public static function add($product_id, $quantity = 1, $product_option_id = null, $incremental = true)
     {
         // Get the current cart, create if needed
         $cart = self::getCart(true);
 
         // Check if product is already in cart
-        $cart_item = $cart->items()->where('product_id', $product->id)->where('product_option_id', $product_option_id)->first();
+        $cart_item = $cart->items()->where('product_id', $product_id)->where('product_option_id', $product_option_id)->first();
         if ($cart_item) {
             // Already in cart, increase quantity
             $cart_item->quantity = $incremental ? $cart_item->quantity + $quantity : $quantity;
@@ -120,7 +120,7 @@ class CartController extends Controller
             // Create a new one instead
             $cart_item = new CartItem;
             $cart_item->cart_id = $cart->id;
-            $cart_item->product_id = $product->id;
+            $cart_item->product_id = $product_id;
             $cart_item->product_option_id = $product_option_id;
             $cart_item->quantity = $quantity;
         }
