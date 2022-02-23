@@ -18,7 +18,7 @@ class CartController extends Controller
     public static function currentCart($create = false)
     {
         // Session variable to store cart id in
-        $session_cart_id = config('webshop.table_prefix') . 'cart_id';
+        $session_cart_id = config('shopwire.table_prefix') . 'cart_id';
 
         // First check if there is a valid cart_id stored in the session
         if (session($session_cart_id)) {
