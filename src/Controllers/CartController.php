@@ -15,7 +15,7 @@ class CartController extends Controller
      * @param  boolean $create If true create and store a new Cart instance if no existing cart is found
      * @return Cart
      */
-    public static function currentCart($create = false)
+    public static function getCart($create = false)
     {
         // Session variable to store cart id in
         $session_cart_id = config('shopwire.table_prefix') . 'cart_id';
@@ -70,7 +70,7 @@ class CartController extends Controller
      */
     public static function count($unique = false)
     {
-        $cart = self::currentCart();
+        $cart = self::getCart();
         if (!$cart) {
             return 0;
         }
@@ -106,7 +106,7 @@ class CartController extends Controller
     public static function add($product, $quantity = 1, $product_option_id = null, $incremental = true)
     {
         // Get the current cart, create if needed
-        $cart = self::currentCart(true);
+        $cart = self::getCart(true);
 
         // Check if product is already in cart
         $cart_item = $cart->items()->where('product_id', $product->id)->where('product_option_id', $product_option_id)->first();
@@ -137,7 +137,7 @@ class CartController extends Controller
     public static function getItems($coupon_code = null)
     {
         // Get cart contents
-        $cart = self::currentCart();
+        $cart = self::getCart();
         if (!$cart) {
             return [];
         }
