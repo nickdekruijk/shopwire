@@ -54,7 +54,7 @@ class Checkout extends Component
             $attributes['type'] = $attributes['type'] ?? 'text';
 
             if (isset($attributes['toggle_group'])) {
-                $group_status[$attributes['toggle_group']] = $this->form[$column];
+                $group_status[$attributes['toggle_group']] = $this->form[$column] ?? false;
             }
 
             // Check for form groups
