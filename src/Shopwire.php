@@ -30,4 +30,17 @@ class Shopwire
     {
         return config('shopwire.currency.symbol') . number_format($amount, config('shopwire.currency.decimals'), trans('shopwire::cart.decimal_point'), trans('shopwire::cart.thousands_seperator'));
     }
+
+    /**
+     * Write a log entry to the shopwire log channel
+     *
+     * @param string $type
+     * @param string $message
+     * @return void
+     */
+    public static function log($type, $message)
+    {
+        $message = "\t" . request()->ip() . "\t" . $message;
+        Log::channel('shopwire')->$type($message);
+    }
 }
