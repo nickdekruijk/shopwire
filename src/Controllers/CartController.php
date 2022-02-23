@@ -167,7 +167,7 @@ class CartController extends Controller
         $with = ['product'];
 
         // Walk thru all items in the cart and calculate VAT
-        foreach ($cart->items()->with($with)->where('quantity', '!=', 0)->get() as $item) {
+        foreach ($cart->items()->with($with)->get() as $item) {
             $response->items[] = (object) [
                 'id' => $item->id,
                 'product_id' => $item->product_id,
