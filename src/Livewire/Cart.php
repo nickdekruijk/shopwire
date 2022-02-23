@@ -11,15 +11,15 @@ class Cart extends Component
     public $unique = false;
 
     protected $listeners = [
-        'cartUpdate' => 'updateCount',
+        'cartUpdate',
     ];
 
     public function mount()
     {
-        $this->updateCount();
+        $this->cartUpdate();
     }
 
-    public function updateCount()
+    public function cartUpdate()
     {
         $this->count = CartController::count($this->unique);
     }
