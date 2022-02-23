@@ -148,13 +148,16 @@ class CartController extends Controller
         // Initialize response object
         $response = (object) [
             'items' => [],
-            'amount_including_vat' => 0,
-            'amount_excluding_vat' => 0,
-            'amount_only_items' => 0,
-            'amount_vat' => [],
-            'weight' => 0,
-            'count' => 0,
-            'count_unique' => 0,
+            'statistics' => [
+                'amount_including_vat' => 0,
+                'amount_excluding_vat' => 0,
+                'amount_only_items' => 0,
+                'amount_vat' => [],
+                'weight' => 0,
+                'count' => 0,
+                'count_unique' => 0,
+            ],
+            'cart' => $cart,
         ];
 
         // Used for tracking the highest VAT rate to calculate shipping costs
@@ -174,17 +177,18 @@ class CartController extends Controller
                 'quantity' => +$item->quantity,
             ];
 
-            $response->amount_including_vat += $item->product->shopwire_price->price_including_vat * $item->quantity;
-            $response->amount_excluding_vat += $item->product->shopwire_price->price_excluding_vat * $item->quantity;
-            $response->amount_vat[$item->product->shopwire_price->vat_rate] = ($response->amount_vat[$item->product->shopwire_price->vat_rate] ?? 0) + ($item->product->shopwire_price->price_including_vat - $item->product->shopwire_price->price_excluding_vat) * $item->quantity;
+            $response->statistics['amount_including_vat'] += $item->product->shopwire_price->price_including_vat * $item->quantity;
+            $response->statistics['amount_excluding_vat'] += $item->product->shopwire_price->price_excluding_vat * $item->quantity;
+            $response->statistics['amount_vat'][$item->product->shopwire_price->vat_rate] = ($response->amount_vat[$item->product->shopwire_price->vat_rate] ?? 0) + ($item->product->shopwire_price->price_including_vat - $item->product->shopwire_price->price_excluding_vat) * $item->quantity;
 
             if ($item->product->shopwire_price->vat_rate > $max_vat_rate) {
                 $max_vat_rate = $item->product->shopwire_price->vat_rate;
             }
-            $response->weight += $item->weight * $item->quantity;;
+            $response->statistics['weight'] += $item->weight * $item->quantity;;
 
-            $response->count += $item->quantity;
-            $response->count_unique++;
+            $response->statistics['count'] += $item->quantity;
+            $response->statistics['count_unique']++;
+
         }
 
         return $response;
