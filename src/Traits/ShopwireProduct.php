@@ -11,6 +11,16 @@ trait ShopwireProduct
         return $this->belongsTo(Vat::class, 'vat_id');
     }
 
+    public function getShopwirePriceTaxFreeAttribute()
+    {
+        $price = $this->shopwire_price;
+        $price->vat_included = false;
+        $price->vat_rate = 0;
+        $price->price_including_vat = $price->price_excluding_vat;
+        $price->price_vat = 0;
+        return $price;
+    }
+
     public function getShopwirePriceAttribute()
     {
         if (config('shopwire.product_option_model') && $this->option && config('shopwire.product_option_columns.price')) {

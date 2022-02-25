@@ -132,6 +132,12 @@ class CartController extends Controller
         return true;
     }
 
+    public static function taxfree($country_code)
+    {
+        return (config('shopwire.taxfree_countries_except') && !in_array($country_code, explode(',', config('shopwire.taxfree_countries_except'))))
+            || (config('shopwire.taxfree_countries')        &&  in_array($country_code, explode(',', config('shopwire.taxfree_countries'))));
+    }
+
     /**
      * Return all cart items and calculate total amounts, discount and VAT.
      *
@@ -169,22 +175,25 @@ class CartController extends Controller
 
         // Walk thru all items in the cart and calculate VAT
         foreach ($cart->items()->with($with)->get() as $item) {
+            // Get price details and vat rates
+            $price = self::taxfree($cart->country_code) ? $item->product->shopwire_price_taxfree : $item->product->shopwire_price;
+
             $response->items[] = (object) [
                 'id' => $item->id,
                 'product_id' => $item->product_id,
                 'title' => $item->product->title,
-                'price' => $item->product->shopwire_price,
+                'price' => $price,
                 'weight' => $item->product->weight,
                 'product' => $item->product,
                 'quantity' => +$item->quantity,
             ];
 
-            $response->statistics['amount_including_vat'] += $item->product->shopwire_price->price_including_vat * $item->quantity;
-            $response->statistics['amount_excluding_vat'] += $item->product->shopwire_price->price_excluding_vat * $item->quantity;
-            $response->statistics['amount_vat'][$item->product->shopwire_price->vat_rate] = ($response->amount_vat[$item->product->shopwire_price->vat_rate] ?? 0) + ($item->product->shopwire_price->price_including_vat - $item->product->shopwire_price->price_excluding_vat) * $item->quantity;
+            $response->statistics['amount_including_vat'] += $price->price_including_vat * $item->quantity;
+            $response->statistics['amount_excluding_vat'] += $price->price_excluding_vat * $item->quantity;
+            $response->statistics['amount_vat'][$price->vat_rate] = ($response->amount_vat[$price->vat_rate] ?? 0) + ($price->price_including_vat - $price->price_excluding_vat) * $item->quantity;
 
-            if ($item->quantity > 0 && $item->product->shopwire_price->vat_rate > $max_vat_rate) {
-                $max_vat_rate = $item->product->shopwire_price->vat_rate;
+            if ($item->quantity > 0 && $price->vat_rate > $max_vat_rate) {
+                $max_vat_rate = $price->vat_rate;
             }
             $response->statistics['weight'] += $item->weight * $item->quantity;;
 

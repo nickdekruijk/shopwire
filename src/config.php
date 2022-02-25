@@ -176,4 +176,33 @@ return [
             'validate' => 'accepted',
         ],
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | taxfree_countries
+    |--------------------------------------------------------------------------
+    | Some shops deliver goods to other countries without calculating VAT
+    | This array contains the countries that are taxfree and customers for
+    | these countries will see 0% VAT during checkout and payment.
+    | Leave set to null if you want to use taxfree_countries_except instead
+    |
+    | Example for EU
+    | 'taxfree_countries' => 'NL,AT,BE,BU,HR,CY,CZ,DK,EE,FI,FR,DE,GR,HU,EI,IT,LV,LT,LU,MT,PL,PT,RO,SK,SI,ES,SE',
+    */
+    'taxfree_countries' => null,
+
+    /*
+    |--------------------------------------------------------------------------
+    | taxfree_countries_except
+    |--------------------------------------------------------------------------
+    | Some shops deliver goods to other countries without calculating VAT
+    | This array contains the countries that are excluded from taxfree and 
+    | customers for these countries will see their normal VAT during checkout 
+    | and payment but customers outside these countries will see 0% VAT.
+    | Leave set to null if you want to use taxfree_countries instead
+    |
+    | Example for EU
+    | 'taxfree_countries_except' => 'NL,AT,BE,BU,HR,CY,CZ,DK,EE,FI,FR,DE,GR,HU,EI,IT,LV,LT,LU,MT,PL,PT,RO,SK,SI,ES,SE',
+    */
+    'taxfree_countries_except' => null,
 ];
