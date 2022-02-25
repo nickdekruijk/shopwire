@@ -133,8 +133,8 @@
                         <input type="radio" wire:model="account" value="none"><span></span> @lang('shopwire::cart.account_none')
                     </label>
                 @endif
-            </label>
-        @endforeach
+            </div>
+        </div>
     </div>
     <div class="shopwire-checkout-form">
         <h3>@lang('shopwire::cart.ship_to')</h3>
