@@ -73,21 +73,65 @@
                 <td colspan="3"><label><input type="checkbox" wire:model="includingVat">@lang('shopwire::cart.vat_toggle')<span></span></label></td>
             </tr>
         </table>
-        <h3>@lang('shopwire::cart.payment')</h3>
-        @foreach($payment_methods as $method)
-            <label class="shopwire-checkout-payment-method">
-                @if (count($payment_methods) > 1)
-                    <input type="radio" wire:model="payment_method" value="{{ $method['id'] }}">
-                @endif
-                {{ $method['description'] }}
-                @if (isset($method['issuers']) && $payment_method == $method['id'])
-                    {{-- @dd($method) --}}
-                    <div class="select shopwire-checkout-payment-issuer"><select wire:model="payment_issuer" class="">
-                        <option value="">@lang('shopwire::cart.payment_select_issuer')</option>
-                        @foreach($method['issuers'] as $issuer_id => $issuer)
-                            <option value="{{ $issuer_id }}">{{ $issuer }}</option>
-                        @endforeach
-                    </select></div>
+        <div class="shopwire-checkout-payment-account">
+            <div class="shopwire-checkout-payment">
+                <h3>@lang('shopwire::cart.payment')</h3>
+                @foreach($payment_methods as $method)
+                    <label class="shopwire-checkout-payment-method">
+                        @if (count($payment_methods) > 1)
+                            <input type="radio" wire:model="payment_method" value="{{ $method['id'] }}"><span></span>
+                        @endif
+                        {{ $method['description'] }}
+                        @if (isset($method['issuers']) && $payment_method == $method['id'])
+                            <span class="shopwire-checkout-select shopwire-checkout-payment-issuer"><select wire:model="payment_issuer" class="">
+                                <option value="">@lang('shopwire::cart.payment_select_issuer')</option>
+                                @foreach($method['issuers'] as $issuer_id => $issuer)
+                                    <option value="{{ $issuer_id }}">{{ $issuer }}</option>
+                                @endforeach
+                            </select></span>
+                        @endif
+                    </label>
+                @endforeach
+            </div>
+            <div class="shopwire-checkout-account">
+                <h3>@lang('shopwire::cart.account')</h3>
+                @auth(config('shopwire.auth_guard'))
+                    @lang('shopwire::cart.logged_in_as') {{ auth()->user()->email }}
+                    <button class="shopwire-checkout-button shopwire-checkout-button-logout" wire:click="logout">@lang('shopwire::cart.logout')</button>
+                @else
+                    <label class="shopwire-checkout-account-email">
+                        <span>@lang('shopwire::cart.email')</span>
+                        <input type="email" wire:model="form.email" placeholder="@lang('shopwire::cart.email')">
+                    </label>
+                    <label class="shopwire-checkout-account-radio">
+                        <input type="radio" wire:model="account" value="login"><span></span> @lang('shopwire::cart.account_login')
+                    </label>
+                    <div class="{{ $account == 'login' ? 'shopwire-checkout-account-show' : 'shopwire-checkout-account-hide' }}">
+                        <label class="shopwire-checkout-account-password">
+                            <span>@lang('shopwire::cart.password')</span>
+                            <input type="password" wire:model="form.password" placeholder="@lang('shopwire::cart.password')">
+                        </label>
+                        <button class="shopwire-checkout-button" wire:click="login">@lang('shopwire::cart.login')</button>
+                        @if ($login_message)
+                            <span class="shopwire-checkout-login-message">{{ $login_message }}</span>
+                        @endif
+                    </div>
+                    <label class="shopwire-checkout-account-radio">
+                        <input type="radio" wire:model="account" value="create"><span></span> @lang('shopwire::cart.account_create')
+                    </label>
+                    <div class="{{ $account == 'create' ? 'shopwire-checkout-account-show' : 'shopwire-checkout-account-hide'}}">
+                        <label class="shopwire-checkout-account-password">
+                            <span>@lang('shopwire::cart.password_choose')</span>
+                            <input type="password" wire:model="password" placeholder="@lang('shopwire::cart.password_choose')">
+                        </label>
+                        <label class="shopwire-checkout-account-password">
+                            <span>@lang('shopwire::cart.password_confirmation')</span>
+                            <input type="password" wire:model="password_confirmation" placeholder="@lang('shopwire::cart.password_confirmation')">
+                        </label>
+                    </div>
+                    <label class="shopwire-checkout-account-radio">
+                        <input type="radio" wire:model="account" value="none"><span></span> @lang('shopwire::cart.account_none')
+                    </label>
                 @endif
             </label>
         @endforeach

@@ -3,12 +3,14 @@
 namespace NickDeKruijk\Shopwire\Livewire;
 
 use Countries;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use NickDeKruijk\Shopwire\Controllers\CartController;
 use NickDeKruijk\Shopwire\Controllers\PaymentController;
 
 class Checkout extends Component
 {
+    public $account;
     public $statistics;
     public $items;
     public $quantity = [];
@@ -23,6 +25,9 @@ class Checkout extends Component
     public $payment_methods;
     public $payment_method;
     public $payment_issuer;
+    public $password;
+    public $password_confirmation;
+    public $login_message;
 
     protected $listeners = [
         'cartUpdate' => 'cartUpdate',
@@ -35,6 +40,9 @@ class Checkout extends Component
 
         // Get stored form values from session
         $this->form = session(config('shopwire.cache_prefix') . 'checkout_form');
+
+        // Get stored account setting from session
+        $this->account = session(config('shopwire.cache_prefix') . 'account') ?: 'login';
 
         // Track group toggle status
         $group_status = [];
@@ -144,6 +152,10 @@ class Checkout extends Component
     {
         session()->put(config('shopwire.cache_prefix') . 'payment_issuer', $payment_issuer);
     }
+    public function updatedAccount($account)
+    {
+        session()->put(config('shopwire.cache_prefix') . 'account', $account);
+    }
 
     public function updatedForm($value, $attribute)
     {
@@ -165,5 +177,17 @@ class Checkout extends Component
     public function render()
     {
         return view('shopwire::checkout');
+    }
+
+    public function login()
+    {
+        if (!Auth::guard(config('shopwire.auth_guard'))->attempt(['email' => $this->form['email'], 'password' => $this->form['password']])) {
+            $this->login_message = __('shopwire::cart.login_invalid');
+        }
+    }
+
+    public function logout()
+    {
+        Auth::guard(config('shopwire.auth_guard'))->logout();
     }
 }

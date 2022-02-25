@@ -214,4 +214,13 @@ return [
     | 'taxfree_countries_except' => 'NL,AT,BE,BU,HR,CY,CZ,DK,EE,FI,FR,DE,GR,HU,EI,IT,LV,LT,LU,MT,PL,PT,RO,SK,SI,ES,SE',
     */
     'taxfree_countries_except' => null,
+
+    /*
+    |--------------------------------------------------------------------------
+    | auth_guard
+    |--------------------------------------------------------------------------
+    | The authentication guard to use when loging in a customer
+    */
+    'auth_guard' => 'web',
+
 ];
