@@ -2,9 +2,9 @@
 
 namespace NickDeKruijk\Shopwire\Livewire;
 
+use Countries;
 use Livewire\Component;
 use NickDeKruijk\Shopwire\Controllers\CartController;
-use Countries;
 use NickDeKruijk\Shopwire\Controllers\PaymentController;
 
 class Checkout extends Component
