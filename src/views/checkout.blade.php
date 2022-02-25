@@ -26,12 +26,12 @@
                     <tr>
                         <td colspan="3" class="shopwire-checkout-shipping">
                             @if (count($shipping_options) > 1)
-                                <div class="select"><select wire:model="shipping">
+                                <span class="shopwire-checkout-select"><select wire:model="shipping">
                                     <option value="">@lang('shopwire::cart.select-shipping')</option>
                                     @foreach($shipping_options as $shipping_rate)
                                         <option value="{{ $shipping_rate['id'] }}">{{ $shipping_rate['title'] }}</option>
                                     @endforeach
-                                </select></div>
+                                </select></span>
                             @elseif ($product['title'] == 'select_shipping')
                                 @lang('shopwire::cart.no-shipping-possible')
                             @else
@@ -70,7 +70,7 @@
             @endif
             <tr class="shopwire-checkout-vat-toggle">
                 <td></td>
-                <td colspan="3"><label><input type="checkbox" wire:model="includingVat">@lang('shopwire::cart.vat_toggle')</label></td>
+                <td colspan="3"><label><input type="checkbox" wire:model="includingVat">@lang('shopwire::cart.vat_toggle')<span></span></label></td>
             </tr>
         </table>
         <h3>@lang('shopwire::cart.payment')</h3>
@@ -98,16 +98,16 @@
             @if (!$attributes['group'] || $form_groups[$attributes['group']])
                 <label class="shopwire-checkout-form-{{ $attributes['type'] }}">
                     @if (isset($attributes['columns']) || $attributes['type'] == 'checkbox')
-                        <input type="checkbox" wire:model="form.{{ $column }}" placeholder="{{ $attributes['label'] }}">
+                        <input type="checkbox" wire:model="form.{{ $column }}"><span></span>
                     @endif
                     <span>{{ $attributes['label'] }}</span>
                     @if ($attributes['type'] == 'country')
-                        <div class="select"><select wire:model="form.{{ $column }}">
+                        <span class="shopwire-checkout-select"><select wire:model="form.{{ $column }}">
                             <option value="">@lang('shopwire::cart.select_country')</option>
                             @foreach($countries as $code => $country)
                                 <option value="{{ $code }}">{{ $country }}</option>
                             @endforeach
-                        </select></div>
+                        </select></span>
                     @elseif ($attributes['type'] == 'textarea')
                         <textarea wire:model="form.{{ $column }}" rows="4" placeholder="{{ $attributes['label'] }}"></textarea>
                     @elseif (!isset($attributes['columns']) && $attributes['type'] != 'checkbox')
