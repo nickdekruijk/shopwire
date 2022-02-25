@@ -29,6 +29,10 @@ To enable automatic country detection, add the following to your .env file:
 ```
 LOCATION_TESTING=false
 ```
+By defaults Shopwire uses Mollie as payment provider, set your Mollie API key in the .env file:
+```
+MOLLIE_KEY=test_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+```
 
 ## Some seeds with data to start with
 Dutch VAT

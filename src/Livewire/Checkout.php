@@ -5,6 +5,7 @@ namespace NickDeKruijk\Shopwire\Livewire;
 use Livewire\Component;
 use NickDeKruijk\Shopwire\Controllers\CartController;
 use Countries;
+use NickDeKruijk\Shopwire\Controllers\PaymentController;
 
 class Checkout extends Component
 {
@@ -19,6 +20,9 @@ class Checkout extends Component
     public $form;
     public $form_columns = [];
     public $form_groups = [];
+    public $payment_methods;
+    public $payment_method;
+    public $payment_issuer;
 
     protected $listeners = [
         'cartUpdate' => 'cartUpdate',
@@ -70,6 +74,17 @@ class Checkout extends Component
 
         // Get the items from the cart
         $this->cartUpdate();
+
+        // Get the payment methods
+        $this->payment_methods = PaymentController::methods();
+        // Get the payment method and issuer from session
+        $this->payment_method = session(config('shopwire.cache_prefix') . 'payment_method');
+        $this->payment_issuer = session(config('shopwire.cache_prefix') . 'payment_issuer');
+
+        // If only one payment mehtod is available, set it as default
+        if (count($this->payment_methods) == 1) {
+            $this->payment_method = key($this->payment_methods);
+        }
     }
 
     public function cartUpdate()
@@ -119,6 +134,15 @@ class Checkout extends Component
         $cart->country_code = $code ?: null;
         $cart->save();
         $this->cartUpdate();
+    }
+
+    public function updatedPaymentMethod($payment_method)
+    {
+        session()->put(config('shopwire.cache_prefix') . 'payment_method', $payment_method);
+    }
+    public function updatedPaymentIssuer($payment_issuer)
+    {
+        session()->put(config('shopwire.cache_prefix') . 'payment_issuer', $payment_issuer);
     }
 
     public function updatedForm($value, $attribute)

@@ -73,6 +73,24 @@
                 <td colspan="3"><label><input type="checkbox" wire:model="includingVat">@lang('shopwire::cart.vat_toggle')</label></td>
             </tr>
         </table>
+        <h3>@lang('shopwire::cart.payment')</h3>
+        @foreach($payment_methods as $method)
+            <label class="shopwire-checkout-payment-method">
+                @if (count($payment_methods) > 1)
+                    <input type="radio" wire:model="payment_method" value="{{ $method['id'] }}">
+                @endif
+                {{ $method['description'] }}
+                @if (isset($method['issuers']) && $payment_method == $method['id'])
+                    {{-- @dd($method) --}}
+                    <div class="select shopwire-checkout-payment-issuer"><select wire:model="payment_issuer" class="">
+                        <option value="">@lang('shopwire::cart.payment_select_issuer')</option>
+                        @foreach($method['issuers'] as $issuer_id => $issuer)
+                            <option value="{{ $issuer_id }}">{{ $issuer }}</option>
+                        @endforeach
+                    </select></div>
+                @endif
+            </label>
+        @endforeach
     </div>
     <div class="shopwire-checkout-form">
         <h3>@lang('shopwire::cart.ship_to')</h3>

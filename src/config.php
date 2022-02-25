@@ -179,6 +179,15 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | payment_provider
+    |--------------------------------------------------------------------------
+    | PaymentProvider to use, must have at least payment() and create() methods
+    |
+    */
+    'payment_provider' => 'NickDeKruijk\Shopwire\PaymentProviders\Mollie',
+
+    /*
+    |--------------------------------------------------------------------------
     | taxfree_countries
     |--------------------------------------------------------------------------
     | Some shops deliver goods to other countries without calculating VAT
