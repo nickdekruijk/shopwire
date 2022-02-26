@@ -76,12 +76,11 @@ class CartController extends Controller
     public static function count($unique = false)
     {
         $cart = self::getCart();
-        if (!$cart) {
-            return 0;
-        }
         $count = 0;
-        foreach ($cart->items as $item) {
-            $count += $unique ? ($item->quantity == 0 ? 0 : 1) : $item->quantity;
+        if ($cart) {
+            foreach ($cart->items as $item) {
+                $count += $unique ? ($item->quantity == 0 ? 0 : 1) : $item->quantity;
+            }
         }
         return $count;
     }
