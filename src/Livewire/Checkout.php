@@ -135,17 +135,13 @@ class Checkout extends Component
 
     public function updatedShipping()
     {
-        $cart = CartController::getCart();
-        $cart->shipping_rate_id = $this->shipping ?: null;
-        $cart->save();
+        CartController::set('shipping_rate_id', $this->shipping);
         $this->cartUpdate();
     }
 
     public function updatedFormCountry($code)
     {
-        $cart = CartController::getCart();
-        $cart->country_code = $code ?: null;
-        $cart->save();
+        CartController::set('country_code', $code);
         $this->cartUpdate();
     }
 

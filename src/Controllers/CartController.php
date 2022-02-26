@@ -86,6 +86,24 @@ class CartController extends Controller
     }
 
     /**
+     * Set a cart column value
+     *
+     * @param string $column
+     * @param mixed $value
+     * @return boolean
+     */
+    public static function set(string $column, mixed $value): bool
+    {
+        $cart = self::getCart();
+        if ($cart) {
+            $cart->$column = $value ?: null;
+            return $cart->save();
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * Update or add a product to the cart with a fixed quantity
      *
      * @param  integer $product_id
