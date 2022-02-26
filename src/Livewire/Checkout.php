@@ -139,12 +139,6 @@ class Checkout extends Component
         $this->cartUpdate();
     }
 
-    public function updatedFormCountry($code)
-    {
-        CartController::set('country_code', $code);
-        $this->cartUpdate();
-    }
-
     public function updatedPaymentMethod($payment_method)
     {
         session()->put(config('shopwire.cache_prefix') . 'payment_method', $payment_method);
@@ -160,6 +154,17 @@ class Checkout extends Component
 
     public function updatedForm($value, $attribute)
     {
+        if ($attribute == 'country') {
+            // Also store the country code in the cart to calculate the shipping
+            CartController::set('country_code', $value);
+            $this->cartUpdate();
+
+            // Also set billing country if it's empty or when billing country is hidden
+            if (!$this->form['billing_country'] || (!$this->form_groups['billing'] && $this->form['billing_country'] == session(config('shopwire.cache_prefix') . 'checkout_form.country'))) {
+                $this->form['billing_country'] = $value;
+                session()->put(config('shopwire.cache_prefix') . 'checkout_form.billing_country', $value);
+            }
+        }
         session()->put(config('shopwire.cache_prefix') . 'checkout_form.' . $attribute, $value);
         if (isset($this->form_columns[$attribute]['toggle_group'])) {
             $this->form_groups[$this->form_columns[$attribute]['toggle_group']] = $value;
