@@ -2,6 +2,8 @@
 
 namespace NickDeKruijk\Shopwire;
 
+use Illuminate\Contracts\Auth\StatefulGuard;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use NickDeKruijk\Shopwire\Controllers\CartController;
 
@@ -42,5 +44,15 @@ class Shopwire
     {
         $message = "\t" . request()->ip() . "\t" . $message;
         Log::channel('shopwire')->$type($message);
+    }
+
+    /**
+     * Return auth object with the correct guard.
+     *
+     * @return StatefulGuard
+     */
+    public static function auth(): StatefulGuard
+    {
+        return Auth::guard(config('shopwire.auth_guard'));
     }
 }

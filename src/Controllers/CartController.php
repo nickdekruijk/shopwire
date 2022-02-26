@@ -3,10 +3,11 @@
 namespace NickDeKruijk\Shopwire\Controllers;
 
 use App\Http\Controllers\Controller;
-use Auth;
 use NickDeKruijk\Shopwire\Models\Cart;
 use NickDeKruijk\Shopwire\Models\CartItem;
+use NickDeKruijk\Shopwire\Models\Discount;
 use NickDeKruijk\Shopwire\Models\ShippingRate;
+use NickDeKruijk\Shopwire\Shopwire;
 use Stevebauman\Location\Facades\Location;
 
 class CartController extends Controller
@@ -40,8 +41,8 @@ class CartController extends Controller
         }
 
         // Thirdly, check if the current user has a cart
-        if (Auth::check()) {
-            $cart = Cart::where('user_id', Auth::user()->id)->latest()->first();
+        if (Shopwire::auth()->check()) {
+            $cart = Cart::where('user_id', Shopwire::auth()->user()->id)->latest()->first();
             if ($cart) {
                 // Found it, store it in session and return it
                 session([$session_cart_id => $cart->id]);
@@ -53,8 +54,8 @@ class CartController extends Controller
         if ($create) {
             $cart = new Cart;
             $cart->session_id = session()->getId();
-            if (Auth::check()) {
-                $cart->user_id = Auth::user()->id;
+            if (Shopwire::auth()->check()) {
+                $cart->user_id = Shopwire::auth()->user()->id;
             }
             $cart->country_code = Location::get()->countryCode;
 

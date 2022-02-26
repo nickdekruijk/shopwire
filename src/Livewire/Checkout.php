@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use NickDeKruijk\Shopwire\Controllers\CartController;
 use NickDeKruijk\Shopwire\Controllers\PaymentController;
+use NickDeKruijk\Shopwire\Shopwire;
 
 class Checkout extends Component
 {
@@ -41,8 +42,12 @@ class Checkout extends Component
         // Get stored form values from session
         $this->form = session(config('shopwire.cache_prefix') . 'checkout_form');
 
-        // Get stored account setting from session
-        $this->account = session(config('shopwire.cache_prefix') . 'account') ?: 'login';
+        // If user is loggedin set account to 'login' else get account method from session
+        if (Shopwire::auth()->check()) {
+            $this->account = 'login';
+        } else {
+            $this->account = session(config('shopwire.cache_prefix') . 'account') ?: 'login';
+        }
 
         // Track group toggle status
         $group_status = [];
@@ -181,13 +186,13 @@ class Checkout extends Component
 
     public function login()
     {
-        if (!Auth::guard(config('shopwire.auth_guard'))->attempt(['email' => $this->form['email'], 'password' => $this->form['password']])) {
+        if (!Shopwire::auth()->attempt(['email' => $this->form['email'], 'password' => $this->form['password']])) {
             $this->login_message = __('shopwire::cart.login_invalid');
         }
     }
 
     public function logout()
     {
-        Auth::guard(config('shopwire.auth_guard'))->logout();
+        Shopwire::auth()->logout();
     }
 }
