@@ -2,7 +2,7 @@
 
 namespace NickDeKruijk\Shopwire;
 
-use Log;
+use Illuminate\Support\Facades\Log;
 use NickDeKruijk\Shopwire\Controllers\CartController;
 
 class Shopwire
@@ -32,7 +32,7 @@ class Shopwire
     }
 
     /**
-     * Write a log entry to the shopwire log channel
+     * Write a log entry to the shopwire log channel.
      *
      * @param string $type
      * @param string $message
