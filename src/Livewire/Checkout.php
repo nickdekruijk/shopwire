@@ -28,7 +28,6 @@ class Checkout extends Component
     public $payment_issuer;
     public $password;
     public $password_confirmation;
-    public $login_message;
 
     protected $listeners = [
         'cartUpdate' => 'cartUpdate',
@@ -40,13 +39,13 @@ class Checkout extends Component
         $this->countries = Countries::getList(app()->getLocale());
 
         // Get stored form values from session
-        $this->form = session(config('shopwire.cache_prefix') . 'checkout_form');
+        $this->form = Shopwire::session('checkout_form');
 
         // If user is loggedin set account to 'login' else get account method from session
         if (Shopwire::auth()->check()) {
             $this->account = 'login';
         } else {
-            $this->account = session(config('shopwire.cache_prefix') . 'account') ?: 'login';
+            $this->account = Shopwire::session('checkout_account') ?: 'login';
         }
 
         // Track group toggle status
@@ -76,7 +75,7 @@ class Checkout extends Component
 
             // Check for form groups
             if (isset($attributes['group'])) {
-                $this->form_groups[$attributes['group']] = $group_status[$attributes['group']] ?? false;
+                $this->form_groups['form.' . $attributes['group']] = $group_status[$attributes['group']] ?? false;
             } else {
                 $attributes['group'] = null;
             }
@@ -91,8 +90,8 @@ class Checkout extends Component
         // Get the payment methods
         $this->payment_methods = PaymentController::methods();
         // Get the payment method and issuer from session
-        $this->payment_method = session(config('shopwire.cache_prefix') . 'payment_method');
-        $this->payment_issuer = session(config('shopwire.cache_prefix') . 'payment_issuer');
+        $this->payment_method = Shopwire::session('checkout_payment_method');
+        $this->payment_issuer = Shopwire::session('checkout_payment_issuer');
 
         // If only one payment mehtod is available, set it as default
         if (count($this->payment_methods) == 1) {
@@ -126,48 +125,44 @@ class Checkout extends Component
         $this->show_zero = true;
         $this->statistics = $cart->statistics;
         $this->shipping_options = $cart->shipping_options;
+        if (count($this->shipping_options) == 1) {
+            $this->shipping = key($this->shipping_options);
+        }
     }
 
-    public function updatedIncludingVat()
+    public function updated($attribute, $value)
     {
-        $this->cartUpdate();
-    }
-
-    public function updatedShipping()
-    {
-        CartController::set('shipping_rate_id', $this->shipping);
-        $this->cartUpdate();
-    }
-
-    public function updatedPaymentMethod($payment_method)
-    {
-        session()->put(config('shopwire.cache_prefix') . 'payment_method', $payment_method);
-    }
-    public function updatedPaymentIssuer($payment_issuer)
-    {
-        session()->put(config('shopwire.cache_prefix') . 'payment_issuer', $payment_issuer);
-    }
-    public function updatedAccount($account)
-    {
-        session()->put(config('shopwire.cache_prefix') . 'account', $account);
-    }
-
-    public function updatedForm($value, $attribute)
-    {
-        if ($attribute == 'country') {
+        if ($attribute == 'including_vat') {
+            $this->cartUpdate();
+            return;
+        }
+        if ($attribute == 'shipping') {
+            CartController::set('shipping_rate_id', $this->shipping);
+            $this->cartUpdate();
+        }
+        if ($attribute == 'form.country') {
             // Also store the country code in the cart to calculate the shipping
             CartController::set('country_code', $value);
             $this->cartUpdate();
 
             // Also set billing country if it's empty or when billing country is hidden
-            if (!$this->form['billing_country'] || (!$this->form_groups['billing'] && $this->form['billing_country'] == session(config('shopwire.cache_prefix') . 'checkout_form.country'))) {
+            if (empty($this->form['billing_country']) || (!$this->form_groups['form.billing'] && $this->form['billing_country'] == Shopwire::session('checkout_form.country'))) {
                 $this->form['billing_country'] = $value;
-                session()->put(config('shopwire.cache_prefix') . 'checkout_form.billing_country', $value);
+                Shopwire::session(['checkout_form.billing_country' => $value]);
             }
         }
-        session()->put(config('shopwire.cache_prefix') . 'checkout_form.' . $attribute, $value);
-        if (isset($this->form_columns[$attribute]['toggle_group'])) {
-            $this->form_groups[$this->form_columns[$attribute]['toggle_group']] = $value;
+
+        if ($attribute != 'password') {
+            Shopwire::session(['checkout_' . $attribute => $value]);
+        }
+
+        if (isset($this->form_columns[substr($attribute, 5)]['toggle_group'])) {
+            $this->form_groups['form.' . $this->form_columns[substr($attribute, 5)]['toggle_group']] = $value;
+            if (!$value) {
+                $this->validateOnly($attribute);
+            }
+        } else {
+            $this->validateOnly($attribute);
         }
     }
 
@@ -188,12 +183,60 @@ class Checkout extends Component
     public function login()
     {
         if (!Shopwire::auth()->attempt(['email' => $this->form['email'], 'password' => $this->form['password']])) {
-            $this->login_message = __('shopwire::cart.login_invalid');
+            $this->addError('form.email', __('shopwire::cart.login_invalid'));
+            $this->addError('form.password', __('shopwire::cart.login_invalid'));
         }
     }
 
     public function logout()
     {
         Shopwire::auth()->logout();
+    }
+
+    protected $validationAttributes = [];
+
+    protected $messages = [];
+
+    protected function rules()
+    {
+        $rules = [
+            'form.email' => 'required|email',
+            'shipping' => 'required',
+            'payment_method' => 'required',
+            'payment_issuer' => 'required_if:payment_method,ideal',
+        ];
+
+        $this->messages['payment_issuer.required_if'] = __('shopwire::cart.payment_issuer_required');
+
+        $this->validationAttributes = [
+            'form.email' => __('shopwire::cart.email'),
+            'form.password' => __('shopwire::cart.password'),
+            'form.payment_method' => __('shopwire::cart.payment_method'),
+        ];
+
+        foreach ($this->form_columns as $column => $attributes) {
+            if (isset($attributes['validate']) && (!isset($attributes['group']) || $this->form_groups['form.' . $attributes['group']])) {
+                $rules['form.' . $column] = $attributes['validate'];
+                $this->validationAttributes['form.' . $column] = $attributes['label'];
+            }
+        }
+        if ($this->account == 'login') {
+            if (Shopwire::auth()->check()) {
+                $this->form['email'] = Shopwire::auth()->user()->email;
+            } else {
+                $rules['form.password'] = 'required';
+            }
+        }
+        if ($this->account == 'create') {
+            $rules['form.password'] = 'required|confirmed';
+            $rules['form.password_confirmation'] = 'required';
+        }
+        return $rules;
+    }
+
+    public function gotoPayment()
+    {
+        $this->validate();
+        $this->login();
     }
 }

@@ -26,6 +26,7 @@
                     <tr>
                         <td colspan="3" class="shopwire-checkout-shipping">
                             @if (count($shipping_options) > 1)
+                                @error('shipping') <span class="shopwire-checkout-form-error">{{ $message }}</span> @enderror
                                 <span class="shopwire-checkout-select"><select wire:model="shipping">
                                     <option value="">@lang('shopwire::cart.select-shipping')</option>
                                     @foreach($shipping_options as $shipping_rate)
@@ -76,22 +77,28 @@
         <div class="shopwire-checkout-payment-account">
             <div class="shopwire-checkout-payment">
                 <h3>@lang('shopwire::cart.payment')</h3>
-                @foreach($payment_methods as $method)
-                    <label class="shopwire-checkout-payment-method">
-                        @if (count($payment_methods) > 1)
-                            <input type="radio" wire:model="payment_method" value="{{ $method['id'] }}"><span></span>
-                        @endif
-                        {{ $method['description'] }}
-                        @if (isset($method['issuers']) && $payment_method == $method['id'])
-                            <span class="shopwire-checkout-select shopwire-checkout-payment-issuer"><select wire:model="payment_issuer" class="">
-                                <option value="">@lang('shopwire::cart.payment_select_issuer')</option>
-                                @foreach($method['issuers'] as $issuer_id => $issuer)
-                                    <option value="{{ $issuer_id }}">{{ $issuer }}</option>
-                                @endforeach
-                            </select></span>
-                        @endif
-                    </label>
-                @endforeach
+                @error('payment_method') <span class="shopwire-checkout-form-error">{{ $message }}</span> @enderror
+                <div class="shopwire-checkout-payment-methods">
+                    @foreach($payment_methods as $method)
+                        <label class="shopwire-checkout-payment-method">
+                            @if (count($payment_methods) > 1)
+                                <input type="radio" wire:model="payment_method" value="{{ $method['id'] }}"><span></span>
+                            @endif
+                            {{ $method['description'] }}
+                            @if (isset($method['issuers']) && $payment_method == $method['id'])
+                                <span class="shopwire-checkout-payment-issuer">
+                                    @error('payment_issuer') <span class="shopwire-checkout-form-error">{{ $message }}</span> @enderror
+                                    <span class="shopwire-checkout-select"><select wire:model="payment_issuer" class="">
+                                        <option value="">@lang('shopwire::cart.payment_select_issuer')</option>
+                                        @foreach($method['issuers'] as $issuer_id => $issuer)
+                                            <option value="{{ $issuer_id }}">{{ $issuer }}</option>
+                                        @endforeach
+                                    </select></span>
+                                </span>
+                            @endif
+                        </label>
+                    @endforeach
+                </div>
             </div>
             <div class="shopwire-checkout-account">
                 <h3>@lang('shopwire::cart.account')</h3>
@@ -100,7 +107,8 @@
                     <button class="shopwire-checkout-button shopwire-checkout-button-logout" wire:click="logout">@lang('shopwire::cart.logout')</button>
                 @else
                     <label class="shopwire-checkout-account-email">
-                        <span>@lang('shopwire::cart.email')</span>
+                        @error('form.email') <span class="shopwire-checkout-form-error">{{ $message }}</span> @enderror
+                        <span class="shopwire-checkout-form-label">@lang('shopwire::cart.email')</span>
                         <input type="email" wire:model="form.email" placeholder="@lang('shopwire::cart.email')">
                     </label>
                     <label class="shopwire-checkout-account-radio">
@@ -108,24 +116,24 @@
                     </label>
                     <div class="{{ $account == 'login' ? 'shopwire-checkout-account-show' : 'shopwire-checkout-account-hide' }}">
                         <label class="shopwire-checkout-account-password">
-                            <span>@lang('shopwire::cart.password')</span>
+                            @error('form.password') <span class="shopwire-checkout-form-error">{{ $message }}</span> @enderror
+                            <span class="shopwire-checkout-form-label">@lang('shopwire::cart.password')</span>
                             <input type="password" wire:model="form.password" placeholder="@lang('shopwire::cart.password')">
                         </label>
                         <button class="shopwire-checkout-button" wire:click="login">@lang('shopwire::cart.login')</button>
-                        @if ($login_message)
-                            <span class="shopwire-checkout-login-message">{{ $login_message }}</span>
-                        @endif
                     </div>
                     <label class="shopwire-checkout-account-radio">
                         <input type="radio" wire:model="account" value="create"><span></span> @lang('shopwire::cart.account_create')
                     </label>
                     <div class="{{ $account == 'create' ? 'shopwire-checkout-account-show' : 'shopwire-checkout-account-hide'}}">
                         <label class="shopwire-checkout-account-password">
-                            <span>@lang('shopwire::cart.password_choose')</span>
+                            @error('form.password') <span class="shopwire-checkout-form-error">{{ $message }}</span> @enderror
+                            <span class="shopwire-checkout-form-label">@lang('shopwire::cart.password_choose')</span>
                             <input type="password" wire:model="password" placeholder="@lang('shopwire::cart.password_choose')">
                         </label>
                         <label class="shopwire-checkout-account-password">
-                            <span>@lang('shopwire::cart.password_confirmation')</span>
+                            @error('form.password_confirmation') <span class="shopwire-checkout-form-error">{{ $message }}</span> @enderror
+                            <span class="shopwire-checkout-form-label">@lang('shopwire::cart.password_confirmation')</span>
                             <input type="password" wire:model="password_confirmation" placeholder="@lang('shopwire::cart.password_confirmation')">
                         </label>
                     </div>
@@ -139,12 +147,13 @@
     <div class="shopwire-checkout-form">
         <h3>@lang('shopwire::cart.ship_to')</h3>
         @foreach($form_columns as $column => $attributes)
-            @if (!$attributes['group'] || $form_groups[$attributes['group']])
+            @if (!$attributes['group'] || $form_groups['form.' . $attributes['group']])
                 <label class="shopwire-checkout-form-{{ $attributes['type'] }}">
+                    @error('form.' . $column) <span class="shopwire-checkout-form-error">{{ $message }}</span> @enderror
                     @if (isset($attributes['columns']) || $attributes['type'] == 'checkbox')
                         <input type="checkbox" wire:model="form.{{ $column }}"><span></span>
                     @endif
-                    <span>{{ $attributes['label'] }}</span>
+                    <span class="shopwire-checkout-form-label">{{ $attributes['label'] }}</span>
                     @if ($attributes['type'] == 'country')
                         <span class="shopwire-checkout-select"><select wire:model="form.{{ $column }}">
                             <option value="">@lang('shopwire::cart.select_country')</option>
@@ -160,5 +169,13 @@
                 </label>
             @endif
         @endforeach
+        <button class="shopwire-checkout-button" wire:click="gotoPayment">@lang('shopwire::cart.goto_payment')</button>
+        @if ($errors->any())
+            <ul class="shopwire-checkout-errors">
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+            </ul>
+        @endif
     </div>
 </div>
