@@ -3,6 +3,7 @@
 namespace NickDeKruijk\Shopwire;
 
 use Illuminate\Contracts\Auth\StatefulGuard;
+use Illuminate\Session\SessionManager;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use NickDeKruijk\Shopwire\Controllers\CartController;
@@ -54,5 +55,25 @@ class Shopwire
     public static function auth(): StatefulGuard
     {
         return Auth::guard(config('shopwire.auth_guard'));
+    }
+
+    /**
+     * Get or put a value in the session inside the shopwire.session_array.
+     *
+     * @param array|string $key
+     * @param mixed $default
+     * @return mixed
+     */
+    public static function session(array|string $key, mixed $default = null): mixed
+    {
+        if (is_array($key)) {
+            foreach ($key as $k => $v) {
+                $key[config('shopwire.session_array') . '.' . $k] = $v;
+                unset($key[$k]);
+            }
+            return session($key);
+        } else {
+            return session(config('shopwire.session_array') . '.' . $key, $default);
+        }
     }
 }

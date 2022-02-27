@@ -20,12 +20,9 @@ class CartController extends Controller
      */
     public static function getCart($create = false)
     {
-        // Session variable to store cart id in
-        $session_cart_id = config('shopwire.table_prefix') . 'cart_id';
-
         // First check if there is a valid cart_id stored in the session
-        if (session($session_cart_id)) {
-            $cart = Cart::find(session($session_cart_id));
+        if (Shopwire::session('cart_id')) {
+            $cart = Cart::find(Shopwire::session('cart_id'));
             if ($cart) {
                 // Found it, return it
                 return $cart;
@@ -36,7 +33,7 @@ class CartController extends Controller
         $cart = Cart::where('session_id', session()->getId())->latest()->first();
         if ($cart) {
             // Found it, store it in session and return it
-            session([$session_cart_id => $cart->id]);
+            Shopwire::session(['cart_id' => $cart->id]);
             return $cart;
         }
 
@@ -45,7 +42,7 @@ class CartController extends Controller
             $cart = Cart::where('user_id', Shopwire::auth()->user()->id)->latest()->first();
             if ($cart) {
                 // Found it, store it in session and return it
-                session([$session_cart_id => $cart->id]);
+                Shopwire::session(['cart_id' => $cart->id]);
                 return $cart;
             }
         }
@@ -61,7 +58,7 @@ class CartController extends Controller
 
             $cart->save();
             // Store the id in the session for performance
-            session([$session_cart_id => $cart->id]);
+            Shopwire::session(['cart_id' => $cart->id]);
             // And return it
             return $cart;
         }
