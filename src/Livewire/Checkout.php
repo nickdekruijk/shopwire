@@ -243,6 +243,9 @@ class Checkout extends Component
 
     public function gotoPayment()
     {
+        // Clear payment errors if any
+        Shopwire::session(['payment_error' => null]);
+
         $this->validate();
 
         // Attempt to login if not loggedin yet
