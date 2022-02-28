@@ -47,4 +47,5 @@ return [
     'vatIncl' => 'Inclusief BTW',
     'vatExcl' => 'Exclusief BTW',
     'vat_toggle' => 'Toon inclusief BTW',
+    'webshop_order' => 'Webshop bestelling #',
 ];

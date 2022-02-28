@@ -169,6 +169,11 @@
                 </label>
             @endif
         @endforeach
+        @if (Shopwire::session('payment_error'))
+            <div class="shopwire-checkout-payment-error">
+                {{ Shopwire::session('payment_error') }}
+            </div>
+        @endif
         <button class="shopwire-checkout-button" wire:click="gotoPayment">@lang('shopwire::cart.goto_payment')</button>
         @if ($errors->any())
             <ul class="shopwire-checkout-errors">

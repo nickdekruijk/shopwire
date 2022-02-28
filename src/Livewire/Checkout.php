@@ -7,6 +7,7 @@ use Illuminate\Validation\Rules\Password;
 use Livewire\Component;
 use NickDeKruijk\Shopwire\Controllers\CartController;
 use NickDeKruijk\Shopwire\Controllers\PaymentController;
+use NickDeKruijk\Shopwire\Models\OrderLine;
 use NickDeKruijk\Shopwire\Shopwire;
 
 class Checkout extends Component
@@ -96,6 +97,9 @@ class Checkout extends Component
         if (count($this->payment_methods) == 1) {
             $this->payment_method = key($this->payment_methods);
         }
+
+        // Store the current url in session for redirecting after failed payment verification
+        Shopwire::session(['checkout_url' => url()->current()]);
     }
 
     public function cartUpdate()
@@ -258,5 +262,51 @@ class Checkout extends Component
                 abort(500, 'Failed to login new user');
             }
         }
+
+        $order = Shopwire::order();
+        $order->user_id = Shopwire::auth()->user()->id ?? null;
+        $order->customer = $this->form;
+
+        $cart = CartController::getItems();
+        foreach ($cart->items as $item) {
+            unset($item->product);
+            $products[] = $item;
+        }
+        $order->products = $products;
+        $order->amount = $cart->statistics['amount_including_vat'];
+        $order->save();
+
+        // Attach OrderLine rows
+        $order->lines()->delete();
+        foreach ($cart->items as $item) {
+            $orderline = new Orderline;
+            $orderline->order_id = $order->id;
+            $orderline->product_id = $item->product_id ?? null;
+            $orderline->product_option_id = $item->product_option_id ?? null;
+            $orderline->title = $item->title;
+            $orderline->quantity = $item->quantity;
+            $orderline->weight = $item->weight ?? null;
+            $orderline->price = $item->price->price_including_vat;
+            $orderline->vat_rate = $item->price->vat_rate;
+            $orderline->vat_included = $item->price->vat_included;
+            $orderline->save();
+        }
+
+        // Get payment id and set redirect/webhook urls
+        $payment = PaymentController::create([
+            'amount' => $order->amount,
+            'currency' => 'EUR',
+            'description' => __('shopwire::cart.webshop_order') . $order->id,
+            'webhookUrl' => app()->environment() == 'local' ? null : route('shopwire-payment-webhook'),
+            'redirectUrl' => route('shopwire-payment-verify'),
+            'method' => $this->payment_method,
+            'issuer' => $this->payment_issuer,
+        ]);
+        $order->payment_id = $payment->id;
+        $order->save();
+
+        // Redirect to payment provider
+        Shopwire::log('info', 'Payment redirect: ' . $order->id . ' ' . $order->payment_id . ' ' . $order->customer['email'] . ' ' . $payment->webhookUrl);
+        return redirect($payment->checkoutUrl, 303);
     }
 }

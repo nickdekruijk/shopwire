@@ -47,4 +47,5 @@ return [
     'vatIncl' => 'VAT Included',
     'vatExcl' => 'VAT Excluded',
     'vat_toggle' => 'Show including VAT',
+    'webshop_order' => 'Webshop order #',
 ];
