@@ -271,4 +271,18 @@ class CartController extends Controller
         $response->items = collect($response->items);
         return $response;
     }
+
+    /**
+     * Empty the current users shopping cart
+     *
+     * @return void
+     */
+    public static function empty()
+    {
+        Shopwire::log('debug', 'Empty cart: ' . Shopwire::session('checkout_form.email'));
+        $cart = self::getCart();
+        if ($cart) {
+            $cart->delete();
+        }
+    }
 }
