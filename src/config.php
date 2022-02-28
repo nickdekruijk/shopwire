@@ -260,9 +260,12 @@ return [
     |--------------------------------------------------------------------------
     | owner_email
     |--------------------------------------------------------------------------
-    | Email address of the webshop owner to send notifications to
+    | Email recipient for webshop owner notifications and new orders
     */
-    'owner_email' => config('mail.from.address'),
+    'owner_email' => [
+        'address' => env('SHOPWIRE_OWNER_ADDRESS', env('MAIL_FROM_ADDRESS', 'hello@example.com')),
+        'name' => env('SHOPWIRE_OWNER_NAME', env('MAIL_FROM_NAME', 'Example')),
+    ],
 
     /*
     |--------------------------------------------------------------------------
