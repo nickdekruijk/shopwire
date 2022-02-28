@@ -198,7 +198,21 @@ class Checkout extends Component
         Shopwire::auth()->logout();
     }
 
-    protected $validationAttributes = [];
+    protected function validationAttributes()
+    {
+        $validationAttributes = [
+            'form.email' => __('shopwire::cart.email'),
+            'form.password' => __('shopwire::cart.password'),
+            'form.password_confirmation' => __('shopwire::cart.password_confirmation'),
+            'form.payment_method' => __('shopwire::cart.payment_method'),
+        ];
+
+        foreach ($this->form_columns as $column => $attributes) {
+            $validationAttributes['form.' . $column] = $attributes['label'];
+        }
+
+        return $validationAttributes;
+    }
 
     protected function messages()
     {
@@ -221,17 +235,9 @@ class Checkout extends Component
             'payment_issuer' => 'required_if:payment_method,ideal',
         ];
 
-        $this->validationAttributes = [
-            'form.email' => __('shopwire::cart.email'),
-            'form.password' => __('shopwire::cart.password'),
-            'form.password_confirmation' => __('shopwire::cart.password_confirmation'),
-            'form.payment_method' => __('shopwire::cart.payment_method'),
-        ];
-
         foreach ($this->form_columns as $column => $attributes) {
             if (isset($attributes['validate']) && (!isset($attributes['group']) || $this->form_groups['form.' . $attributes['group']])) {
                 $rules['form.' . $column] = $attributes['validate'];
-                $this->validationAttributes['form.' . $column] = $attributes['label'];
             }
         }
 
