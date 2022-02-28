@@ -4,7 +4,6 @@ namespace NickDeKruijk\Shopwire;
 
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Auth\StatefulGuard;
-use Illuminate\Session\SessionManager;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use NickDeKruijk\Shopwire\Controllers\CartController;
