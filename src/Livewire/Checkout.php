@@ -190,6 +190,8 @@ class Checkout extends Component
             $this->addError('form.email', __('shopwire::cart.login_invalid'));
             $this->addError('form.password', __('shopwire::cart.login_invalid'));
             return false;
+        } else {
+            return true;
         }
     }
 
