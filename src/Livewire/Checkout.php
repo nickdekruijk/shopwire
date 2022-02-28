@@ -244,5 +244,19 @@ class Checkout extends Component
         if ($this->account == 'login' && Shopwire::auth()->guest()) {
             $this->login();
         }
+
+        // Create account if customer wants to
+        if ($this->account == 'create') {
+            $model = Shopwire::auth()->getProvider()->getModel();
+            $user = (new $model)->create([
+                'email' => $this->form['email'],
+                'name' => $this->form['firstname'] . ' ' . $this->form['lastname'],
+                'password' => bcrypt($this->form['password']),
+            ]);
+            // Login with the new account
+            if (!Shopwire::auth()->attempt(['email' => $user->email, 'password' => $this->form['password']])) {
+                abort(500, 'Failed to login new user');
+            }
+        }
     }
 }
