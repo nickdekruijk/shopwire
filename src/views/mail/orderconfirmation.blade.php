@@ -7,12 +7,12 @@
 
 {!! $order->html !!}<br>
 
-@lang('shopwire::mail.your_order_will_be_shipped_to') 
-{{ $order->customer['company'] }}
+@lang('shopwire::mail.your_order_will_be_shipped_to')
+<br>{{ $order->customer['company'] }}
 <br>{{ $order->customer['firstname'] }} {{ $order->customer['lastname'] }}
 <br>{{ $order->customer['address'] }}
 <br>{{ $order->customer['postcode'] }}&nbsp; {{ $order->customer['city'] }}
-<br>{{ Countries::getOne($order->customer['country'], app()->getLocale()) }}
+<br>{{ $order->customer['country'] }}
 
 @lang('shopwire::mail.question_about_your_order') 
 
