@@ -151,7 +151,8 @@ class Checkout extends Component
             }
         }
 
-        if ($attribute != 'password') {
+        // If attribute isn't a password store the value in session
+        if (!str_contains($attribute, 'password')) {
             Shopwire::session(['checkout_' . $attribute => $value]);
         }
 
