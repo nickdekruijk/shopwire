@@ -42,6 +42,7 @@ return [
     'payment_failed' => 'Payment failed, try again.',
     'payment_open' => 'Payment not completed, try again.',
     'payment_expired' => 'Payment expired, try again.',
+    'payment_pending' => 'Payment pending, try again.',
     'discount' => 'Discount',
     'vat' => 'VAT',
     'vatIncl' => 'VAT Included',

@@ -42,6 +42,7 @@ return [
     'payment_failed' => 'Betaling mislukt, probeerd het nog eens.',
     'payment_open' => 'Betaling niet afgerond, probeerd het nog eens.',
     'payment_expired' => 'Betaling verlopen, probeerd het nog eens.',
+    'payment_pending' => 'Betaling in behandeling, probeerd het nog eens.',
     'discount' => 'Korting',
     'vat' => 'BTW',
     'vatIncl' => 'Inclusief BTW',
