@@ -246,6 +246,7 @@ class Checkout extends Component
         // Clear payment errors if any
         Shopwire::session(['payment_error' => null]);
 
+        // Validate all input
         $this->validate();
 
         // Attempt to login if not loggedin yet
@@ -269,12 +270,14 @@ class Checkout extends Component
             }
         }
 
+        // Get the Order object and update it
         $order = Shopwire::order();
         $order->user_id = Shopwire::auth()->user()->id ?? null;
         $order->customer = $this->form;
-
+        // Save the products in the order
         $cart = CartController::getItems();
         foreach ($cart->items as $item) {
+            // We don't want the Product model in this array
             unset($item->product);
             $products[] = $item;
         }
