@@ -7,6 +7,7 @@ use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use NickDeKruijk\Shopwire\Controllers\CartController;
+use NickDeKruijk\Shopwire\Models\Order;
 
 class Shopwire
 {
@@ -75,5 +76,28 @@ class Shopwire
         } else {
             return session(config('shopwire.session_array') . '.' . $key, $default);
         }
+    }
+
+    /**
+     * Return the current order or create new one.
+     *
+     * @param string|null $payment_id
+     * @return Order
+     */
+    public static function order(string $payment_id = null): Order
+    {
+        $model = config('shopwire.order_model');
+        if ($payment_id) {
+            return $model::where('payment_id', $payment_id)->firstOrFail();
+        } elseif (self::session('order_id')) {
+            $order = $model::find(self::session('order_id'));
+            if ($order) {
+                return $order;
+            }
+        }
+        $order = new $model;
+        $order->save();
+        self::session(['order_id' => $order->id]);
+        return $order;
     }
 }
