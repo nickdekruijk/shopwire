@@ -34,6 +34,14 @@ By defaults Shopwire uses Mollie as payment provider, set your Mollie API key in
 MOLLIE_KEY=test_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
+## Webhooks and Csrf
+To make the payment provider webhooks work you may need to update the `$except` array in `app\Http\Middleware\VerifyCsrfToken.php`
+```php
+    protected $except = [
+        'shopwire/payment/webhook',
+    ];
+```
+
 ## Some seeds with data to start with
 Dutch VAT
 `php artisan db:seed --class=NickDeKruijk\\Shopwire\\Seeds\\VatDutch`
