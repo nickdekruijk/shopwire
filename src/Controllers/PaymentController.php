@@ -68,7 +68,7 @@ class PaymentController extends Controller
             Shopwire::log('info', 'Verified payment: ' . $order->payment_id);
             Mail::send((new (config('shopwire.mailable_customer'))($order)));
             Mail::send((new (config('shopwire.mailable_owner'))($order)));
-            Shopwire::log('info', 'Mail sent: ' . $mailable . ' ' . $order->customer['email']);
+            Shopwire::log('info', 'Mails sent: ' . $order->customer['email']);
             $order->paid = true;
             $order->save();
         }
