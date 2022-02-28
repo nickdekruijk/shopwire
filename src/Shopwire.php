@@ -2,6 +2,7 @@
 
 namespace NickDeKruijk\Shopwire;
 
+use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Session\SessionManager;
 use Illuminate\Support\Facades\Auth;
@@ -50,9 +51,9 @@ class Shopwire
     /**
      * Return auth object with the correct guard.
      *
-     * @return StatefulGuard
+     * @return Guard|StatefulGuard
      */
-    public static function auth(): StatefulGuard
+    public static function auth(): Guard|StatefulGuard
     {
         return Auth::guard(config('shopwire.auth_guard'));
     }
