@@ -331,6 +331,7 @@ class Checkout extends Component
             'issuer' => $this->payment_issuer,
         ]);
         $order->payment_id = $payment->id;
+        $order->payment_method = $this->payment_method;
         $order->save();
 
         // Redirect to payment provider
