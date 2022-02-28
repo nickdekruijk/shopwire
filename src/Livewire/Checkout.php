@@ -292,9 +292,14 @@ class Checkout extends Component
         // Get the Order object and update it
         $order = Shopwire::order();
         $order->user_id = Shopwire::auth()->user()->id ?? null;
+
+        // Set the customer details
         $order->customer = $this->form;
+        $order->customer = $order->customerSorted;
+
         // Save the products in the order
         $cart = CartController::getItems();
+        $order->html = view('shopwire::cart-html', ['cart' => $cart])->render();
         foreach ($cart->items as $item) {
             // We don't want the Product model in this array
             unset($item->product);
