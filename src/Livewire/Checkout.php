@@ -189,6 +189,7 @@ class Checkout extends Component
         if (!Shopwire::auth()->attempt(['email' => $this->form['email'], 'password' => $this->form['password']])) {
             $this->addError('form.email', __('shopwire::cart.login_invalid'));
             $this->addError('form.password', __('shopwire::cart.login_invalid'));
+            return false;
         }
     }
 
@@ -246,7 +247,9 @@ class Checkout extends Component
 
         // Attempt to login if not loggedin yet
         if ($this->account == 'login' && Shopwire::auth()->guest()) {
-            $this->login();
+            if (!$this->login()) {
+                return false;
+            }
         }
 
         // Create account if customer wants to
