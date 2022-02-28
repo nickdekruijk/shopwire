@@ -4,6 +4,7 @@ namespace NickDeKruijk\Shopwire\Livewire;
 
 use Countries;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rules\Password;
 use Livewire\Component;
 use NickDeKruijk\Shopwire\Controllers\CartController;
 use NickDeKruijk\Shopwire\Controllers\PaymentController;
@@ -26,8 +27,6 @@ class Checkout extends Component
     public $payment_methods;
     public $payment_method;
     public $payment_issuer;
-    public $password;
-    public $password_confirmation;
 
     protected $listeners = [
         'cartUpdate' => 'cartUpdate',
@@ -212,6 +211,7 @@ class Checkout extends Component
         $this->validationAttributes = [
             'form.email' => __('shopwire::cart.email'),
             'form.password' => __('shopwire::cart.password'),
+            'form.password_confirmation' => __('shopwire::cart.password_confirmation'),
             'form.payment_method' => __('shopwire::cart.payment_method'),
         ];
 
@@ -229,7 +229,8 @@ class Checkout extends Component
             }
         }
         if ($this->account == 'create') {
-            $rules['form.password'] = 'required|confirmed';
+            $rules['form.email'] = 'required|email:rfc,strict,dns,spoof,filter|unique:users,email';
+            $rules['form.password'] = ['required', Password::min(8)->uncompromised()->letters()->numbers()->mixedCase()->symbols(), 'confirmed'];
             $rules['form.password_confirmation'] = 'required';
         }
         return $rules;
@@ -238,6 +239,10 @@ class Checkout extends Component
     public function gotoPayment()
     {
         $this->validate();
-        $this->login();
+
+        // Attempt to login if not loggedin yet
+        if ($this->account == 'login' && Shopwire::auth()->guest()) {
+            $this->login();
+        }
     }
 }

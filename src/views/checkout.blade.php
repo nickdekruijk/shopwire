@@ -129,12 +129,12 @@
                         <label class="shopwire-checkout-account-password">
                             @error('form.password') <span class="shopwire-checkout-form-error">{{ $message }}</span> @enderror
                             <span class="shopwire-checkout-form-label">@lang('shopwire::cart.password_choose')</span>
-                            <input type="password" wire:model="password" placeholder="@lang('shopwire::cart.password_choose')">
+                            <input type="password" wire:model="form.password" placeholder="@lang('shopwire::cart.password_choose')">
                         </label>
                         <label class="shopwire-checkout-account-password">
                             @error('form.password_confirmation') <span class="shopwire-checkout-form-error">{{ $message }}</span> @enderror
                             <span class="shopwire-checkout-form-label">@lang('shopwire::cart.password_confirmation')</span>
-                            <input type="password" wire:model="password_confirmation" placeholder="@lang('shopwire::cart.password_confirmation')">
+                            <input type="password" wire:model="form.password_confirmation" placeholder="@lang('shopwire::cart.password_confirmation')">
                         </label>
                     </div>
                     <label class="shopwire-checkout-account-radio">
