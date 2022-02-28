@@ -50,7 +50,7 @@ class Shopwire
     /**
      * Return auth object with the correct guard.
      *
-     * @return Guard|StatefulGuard
+     * @return mixed
      */
     public static function auth(): Guard|StatefulGuard
     {
