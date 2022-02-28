@@ -3,6 +3,7 @@
 use App\Models\Product;
 use NickDeKruijk\Shopwire\Mail\OrderConfirmation;
 use NickDeKruijk\Shopwire\Mail\OrderCreated;
+use NickDeKruijk\Shopwire\Models\Order;
 use NickDeKruijk\Shopwire\PaymentProviders\Mollie;
 
 return [
@@ -278,4 +279,16 @@ return [
     | Send this mail to the webshop owner when a new order is placed
     */
     'mailable_owner' => OrderCreated::class,
+
+    /*
+    |--------------------------------------------------------------------------
+    | order_model
+    |--------------------------------------------------------------------------
+    |
+    | If you want to customize the Order model then make a new model 
+    | App\Models\Order class that extends \NickDeKruijk\Shopwire\Models\Order 
+    | and change the value below to 'App\Models\Order',
+    |
+    */
+    'order_model' => Order::class,
 ];
