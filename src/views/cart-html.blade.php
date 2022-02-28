@@ -9,9 +9,9 @@
         @if ($item->product_id)
             <tr>
                 <td class="shopwire-checkout-product">{{ $item->title }}</td>
-                <td align="right" class="shopwire-checkout-price">{{ Shopwire::money($item->product['price']) }}</td>
+                <td align="right" class="shopwire-checkout-price">{{ Shopwire::money($item->price->price_including_vat) }}</td>
                 <td align="center" class="shopwire-checkout-quantity">{{ $item->quantity }}</td>
-                <td align="right" class="shopwire-checkout-total">{{ Shopwire::money($item->quantity * $item->product['price']) }}</td>
+                <td align="right" class="shopwire-checkout-total">{{ Shopwire::money($item->quantity * $item->price->price_including_vat) }}</td>
             </tr>
         @else
             <tr>
