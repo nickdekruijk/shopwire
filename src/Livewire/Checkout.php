@@ -3,7 +3,6 @@
 namespace NickDeKruijk\Shopwire\Livewire;
 
 use Countries;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules\Password;
 use Livewire\Component;
 use NickDeKruijk\Shopwire\Controllers\CartController;
