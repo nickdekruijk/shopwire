@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Product;
+use NickDeKruijk\Shopwire\PaymentProviders\Mollie;
 
 return [
 
@@ -202,7 +203,7 @@ return [
     | PaymentProvider to use, must have at least payment() and create() methods
     |
     */
-    'payment_provider' => 'NickDeKruijk\Shopwire\PaymentProviders\Mollie',
+    'payment_provider' => Mollie::class,
 
     /*
     |--------------------------------------------------------------------------
