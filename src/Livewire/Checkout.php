@@ -200,9 +200,19 @@ class Checkout extends Component
 
     protected $validationAttributes = [];
 
-    protected $messages = [];
+    protected function messages()
+    {
+        return [
+            'payment_issuer.required_if' => __('shopwire::cart.payment_issuer_required'),
+        ];
+    }
 
-    protected function rules()
+    /**
+     * Set the validation rules for the checkout
+     *
+     * @return array
+     */
+    protected function rules(): array
     {
         $rules = [
             'form.email' => 'required|email',
@@ -210,8 +220,6 @@ class Checkout extends Component
             'payment_method' => 'required',
             'payment_issuer' => 'required_if:payment_method,ideal',
         ];
-
-        $this->messages['payment_issuer.required_if'] = __('shopwire::cart.payment_issuer_required');
 
         $this->validationAttributes = [
             'form.email' => __('shopwire::cart.email'),
@@ -226,6 +234,7 @@ class Checkout extends Component
                 $this->validationAttributes['form.' . $column] = $attributes['label'];
             }
         }
+
         if ($this->account == 'login') {
             if (Shopwire::auth()->check()) {
                 $this->form['email'] = Shopwire::auth()->user()->email;
@@ -233,11 +242,13 @@ class Checkout extends Component
                 $rules['form.password'] = 'required';
             }
         }
+
         if ($this->account == 'create') {
             $rules['form.email'] = 'required|email:rfc,strict,dns,spoof,filter|unique:users,email';
             $rules['form.password'] = ['required', Password::min(8)->uncompromised()->letters()->numbers()->mixedCase()->symbols(), 'confirmed'];
             $rules['form.password_confirmation'] = 'required';
         }
+
         return $rules;
     }
 
