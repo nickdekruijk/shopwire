@@ -26,6 +26,17 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | routes_prefix
+    |--------------------------------------------------------------------------
+    | Some actions like payment redirects and webhooks require unique urls. 
+    | These routes will be created automaticaly and to avoid conflicts with 
+    | other routes from the app you can add prefix to those urls here.
+    | Webhook for payments will be /shopwire/payment/webhook for example.
+    */
+    'routes_prefix' => 'shopwire',
+
+    /*
+    |--------------------------------------------------------------------------
     | cache_prefix
     |--------------------------------------------------------------------------
     | Prefix to add to cache keys

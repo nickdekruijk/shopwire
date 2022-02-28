@@ -23,6 +23,8 @@ class ShopwireServiceProvider extends ServiceProvider
             __DIR__ . '/config.php' => config_path('shopwire.php'),
         ], 'config');
 
+        $this->loadRoutesFrom(__DIR__ . '/routes.php');
+
         $this->loadTranslationsFrom(__DIR__ . '/lang', 'shopwire');
 
         if (config('shopwire.migration')) {
