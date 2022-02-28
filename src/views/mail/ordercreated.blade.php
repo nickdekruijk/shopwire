@@ -1,12 +1,15 @@
 @component('mail::message')
-# Introduction
+@lang('shopwire::mail.new_order_from') {{ $order->customer['firstname'] }} {{ $order->customer['lastname'] }},
 
-The body of your message.
+{!! $order->html !!}<br>
 
-@component('mail::button', ['url' => ''])
-Button Text
-@endcomponent
+<table>
+    @foreach ($order->customerSorted as $key => $value)
+        <tr>
+            <td>{{ ucfirst(str_replace('_', ' ', $key)) }}</td>
+            <td>{{ $value }}</td>
+        </tr>
+    @endforeach
+</table>
 
-Thanks,<br>
-{{ config('app.name') }}
 @endcomponent
