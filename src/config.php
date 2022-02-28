@@ -1,6 +1,8 @@
 <?php
 
 use App\Models\Product;
+use NickDeKruijk\Shopwire\Mail\OrderConfirmation;
+use NickDeKruijk\Shopwire\Mail\OrderCreated;
 use NickDeKruijk\Shopwire\PaymentProviders\Mollie;
 
 return [
@@ -242,4 +244,38 @@ return [
     */
     'auth_guard' => 'web',
 
+    /*
+    |--------------------------------------------------------------------------
+    | owner_email
+    |--------------------------------------------------------------------------
+    | Email address of the webshop owner to send notifications to
+    */
+    'owner_email' => config('mail.from.address'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | email_from
+    |--------------------------------------------------------------------------
+    | Email sender to use for all notifications and order confirmations
+    */
+    'email_from' => [
+        'address' => env('SHOPWIRE_FROM_ADDRESS', env('MAIL_FROM_ADDRESS', 'hello@example.com')),
+        'name' => env('SHOPWIRE_FROM_NAME', env('MAIL_FROM_NAME', 'Example')),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | mailable_customer
+    |--------------------------------------------------------------------------
+    | Send this mail to the customer when a new order is placed
+    */
+    'mailable_customer' => OrderConfirmation::class,
+
+    /*
+    |--------------------------------------------------------------------------
+    | mailable_owner
+    |--------------------------------------------------------------------------
+    | Send this mail to the webshop owner when a new order is placed
+    */
+    'mailable_owner' => OrderCreated::class,
 ];
