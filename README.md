@@ -42,7 +42,10 @@ To make the payment provider webhooks work you may need to update the `$except` 
     ];
 ```
 
-## Some seeds with data to start with
+### Admin package integration
+To manage products/vat/orders etc with the [nickdekruijk/admin](https://github.com/nickdekruijk/admin) package add the modules as described in [this example file](https://github.com/nickdekruijk/webshop/blob/master/src/examples/admin.md) to your `config/admin.php` file.
+
+### Some seeds with data to start with
 Dutch VAT
 `php artisan db:seed --class=NickDeKruijk\\Shopwire\\Seeds\\VatDutch`
 
