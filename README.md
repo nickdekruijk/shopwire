@@ -1,18 +1,21 @@
+[![Latest Stable Version](https://poser.pugx.org/nickdekruijk/shopwire/v/stable)](https://packagist.org/packages/nickdekruijk/shopwire)
+[![Latest Unstable Version](https://poser.pugx.org/nickdekruijk/shopwire/v/unstable)](https://packagist.org/packages/nickdekruijk/shopwire)
+[![Monthly Downloads](https://poser.pugx.org/nickdekruijk/shopwire/d/monthly)](https://packagist.org/packages/nickdekruijk/shopwire)
+[![Total Downloads](https://poser.pugx.org/nickdekruijk/shopwire/downloads)](https://packagist.org/packages/nickdekruijk/shopwire)
+[![License](https://poser.pugx.org/nickdekruijk/shopwire/license)](https://packagist.org/packages/nickdekruijk/shopwire)
+
 # Shopwire
 A simple, easy to implement shopping cart and checkout package for Laravel 9 using Livewire.
 
 ## Installation
-
 To install run the following command:
-
-```bash
-composer require nickdekruijk/shopwire
-```
+`composer require nickdekruijk/shopwire`
 
 Afterwards run the migration command:
-```bash
-php artisan migrate
-```
+`php artisan migrate`
+
+Publish the config file with:
+`php artisan vendor:publish --tag=config --provider="NickDeKruijk\Webshop\ServiceProvider"`
 
 ## Prepare your Product model
 Add ShopwireProduct trait:
@@ -52,7 +55,8 @@ Dutch VAT
 Dutch Shipment methods
 `php artisan db:seed --class=NickDeKruijk\\Shopwire\\Seeds\\ShippingDutch`
 
+<!-- Dutch Discounts
+`php artisan db:seed --class=NickDeKruijk\\Shopwire\\Seeds\\DiscountsDutch` -->
+
 ## License
 Shopwire is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-
-More later...
