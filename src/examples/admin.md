@@ -6,7 +6,7 @@ Add and edit the modules below to your `config/admin.php` file.
             'icon' => 'fa-gift',
             'title_nl' => 'Producten',
             'model' => 'App\Models\Product',
-            'index' => 'name,price,home,vat.description',
+            'index' => 'name,price,shopwire_vat.description',
             'active' => 'active',
             'orderBy' => 'sort',
             'sortable' => true,
