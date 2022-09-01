@@ -19,7 +19,7 @@ class CreateOrderLinesTable extends Migration
             $table->foreignId('order_id')->constrained(config('shopwire.table_prefix') . 'orders')->onDelete('cascade');
 
             $product = config('shopwire.product_model');
-            $table->foreignId('product_id')->nullable()->constrained((new $product)->getTable());
+            $table->foreignId('product_id')->nullable();
 
             $product_option = config('shopwire.product_option_model');
             if ($product_option) {

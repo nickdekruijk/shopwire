@@ -24,7 +24,6 @@ class CreateCartItemsTable extends Migration
             $table->foreign('cart_id')->references('id')->on(config('shopwire.table_prefix') . 'carts')->onDelete('cascade');
 
             $model = config('shopwire.product_model');
-            $table->foreign('product_id')->references('id')->on((new $model)->getTable())->onDelete('cascade');
         });
     }
 
