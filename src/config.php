@@ -100,7 +100,8 @@ return [
     |--------------------------------------------------------------------------
     | The url to go to when customer clicks on checkout
     */
-    'checkout_url' => Route::has('shopwire.checkout') ? route('shopwire.checkout') : '/checkout',
+    // 'checkout_url' => Route::has('shopwire.checkout') ? route('shopwire.checkout') : '/checkout',
+    'checkout_url' => '/checkout',
 
     /*
     |--------------------------------------------------------------------------
