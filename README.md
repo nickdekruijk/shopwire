@@ -9,13 +9,14 @@ A simple, easy to implement shopping cart and checkout package for Laravel 9 usi
 
 ## Installation
 To install run the following command:
+
 `composer require nickdekruijk/shopwire`
 
-Afterwards run the migration command:
-`php artisan migrate`
+***Before your run php artisan migrate make sure your Product model is properly setup.***
 
 Publish the config file with:
-`php artisan vendor:publish --tag=config --provider="NickDeKruijk\Webshop\ServiceProvider"`
+
+`php artisan vendor:publish --tag=config --provider="NickDeKruijk\Shopwire\ShopwireServiceProvider"`
 
 ## Prepare your Product model
 Add ShopwireProduct trait:
@@ -26,6 +27,9 @@ class Product extends Model
     use ShopwireProduct;
 ```
 If your model is different from the default (App\Models\Product), you can change the model name in the config file.
+
+Afterwards run the migration command:
+`php artisan migrate`
 
 ## Environment
 To enable automatic country detection, add the following to your .env file:
