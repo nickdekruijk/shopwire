@@ -49,6 +49,16 @@ To make the payment provider webhooks work you may need to update the `$except` 
     ];
 ```
 
+## Logging
+You need to make a logging channel called shopwire, add something like this to `config/logging.php`:
+```php
+        'shopwire' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/shopwire.log'),
+            'level' => 'debug',
+        ],
+```
+
 ### Admin package integration
 To manage products/vat/orders etc with the [nickdekruijk/admin](https://github.com/nickdekruijk/admin) package add the modules as described in [this example file](https://github.com/nickdekruijk/webshop/blob/master/src/examples/admin.md) to your `config/admin.php` file.
 
