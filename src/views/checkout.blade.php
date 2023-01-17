@@ -155,16 +155,16 @@
                     @endif
                     <span class="shopwire-checkout-form-label">{{ $attributes['label'] }}</span>
                     @if ($attributes['type'] == 'country')
-                        <span class="shopwire-checkout-select"><select wire:model="form.{{ $column }}">
+                        <span class="shopwire-checkout-select"><select name="{{ $column }}" wire:model="form.{{ $column }}">
                             <option value="">@lang('shopwire::cart.select_country')</option>
                             @foreach($countries as $code => $country)
                                 <option value="{{ $code }}">{{ $country }}</option>
                             @endforeach
                         </select></span>
                     @elseif ($attributes['type'] == 'textarea')
-                        <textarea wire:model="form.{{ $column }}" rows="4" placeholder="{{ $attributes['label'] }}"></textarea>
+                        <textarea name="{{ $column }}" wire:model="form.{{ $column }}" rows="4" placeholder="{{ $attributes['label'] }}"></textarea>
                     @elseif (!isset($attributes['columns']) && $attributes['type'] != 'checkbox')
-                        <input type="{{ $attributes['type'] }}" wire:model="form.{{ $column }}" placeholder="{{ $attributes['label'] }}">
+                        <input type="{{ $attributes['type'] }}" name="{{ $column }}" wire:model="form.{{ $column }}" placeholder="{{ $attributes['label'] }}">
                     @endif
                 </label>
             @endif
