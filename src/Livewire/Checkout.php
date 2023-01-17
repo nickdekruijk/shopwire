@@ -8,6 +8,7 @@ use Livewire\Component;
 use NickDeKruijk\Shopwire\Controllers\CartController;
 use NickDeKruijk\Shopwire\Controllers\PaymentController;
 use NickDeKruijk\Shopwire\Models\OrderLine;
+use NickDeKruijk\Shopwire\Rules\DiscountCodeValid;
 use NickDeKruijk\Shopwire\Shopwire;
 
 class Checkout extends Component
@@ -27,6 +28,7 @@ class Checkout extends Component
     public $payment_methods;
     public $payment_method;
     public $payment_issuer;
+    public $enter_discount_code;
 
     protected $listeners = [
         'cartUpdate' => 'cartUpdate',
@@ -104,7 +106,7 @@ class Checkout extends Component
 
     public function cartUpdate()
     {
-        $cart = CartController::getItems();
+        $cart = CartController::getItems($this->form['discount_code'] ?? null);
         $this->form['country'] = $cart->cart->country_code;
         $this->shipping = $cart->cart->shipping_rate_id;
         $this->items = [];
@@ -120,7 +122,8 @@ class Checkout extends Component
                 $this->items[] = [
                     'id' => $item->product_id,
                     'title' => $item->title,
-                    'url' => $item->product_id ? $item->product->url : null,
+                    'type' => $item->type ?? null,
+                    'url' => $item->product_id > 0 ? $item->product->url : null,
                     'price' => $this->includingVat ? $item->price->price_including_vat : $item->price->price_excluding_vat,
                 ];
             }
@@ -160,6 +163,7 @@ class Checkout extends Component
             Shopwire::session(['checkout_' . $attribute => $value]);
         }
 
+        // Validate input but check if the column isn't hidden by form group
         if (isset($this->form_columns[substr($attribute, 5)]['toggle_group'])) {
             $this->form_groups['form.' . $this->form_columns[substr($attribute, 5)]['toggle_group']] = $value;
             if (!$value) {
@@ -177,6 +181,19 @@ class Checkout extends Component
         }
         CartController::update($product_id, $quantity);
         $this->emit('cartUpdate');
+    }
+
+    public function updatedFormDiscountCode($discount_code)
+    {
+        $this->cartUpdate();
+    }
+
+    public function discountEnter()
+    {
+        $this->form['discount_code'] = null;
+        $this->enter_discount_code = true;
+        $this->updated('form.discount_code', null);
+        $this->cartUpdate();
     }
 
     public function render()
@@ -235,6 +252,7 @@ class Checkout extends Component
             'shipping' => 'required',
             'payment_method' => 'required',
             'payment_issuer' => 'required_if:payment_method,ideal',
+            'form.discount_code' => [new DiscountCodeValid],
         ];
 
         foreach ($this->form_columns as $column => $attributes) {
@@ -298,7 +316,7 @@ class Checkout extends Component
         $order->customer = $order->customerSorted;
 
         // Save the products in the order
-        $cart = CartController::getItems();
+        $cart = CartController::getItems($this->form['discount_code'] ?? null);
         $order->html = view('shopwire::cart-html', ['cart' => $cart])->render();
         foreach ($cart->items as $item) {
             // We don't want the Product model in this array

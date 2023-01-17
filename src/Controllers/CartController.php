@@ -156,10 +156,10 @@ class CartController extends Controller
     /**
      * Return all cart items and calculate total amounts, discount and VAT.
      *
-     * @param  integer $coupon_code Apply discount for a coupon code.
+     * @param  integer $discount_code Apply discount for a discount code.
      * @return object
      */
-    public static function getItems($coupon_code = null)
+    public static function getItems($discount_code = null)
     {
         // Get cart contents
         $cart = self::getCart();
@@ -235,11 +235,24 @@ class CartController extends Controller
         }
         $response->shipping_options = $shipping_options;
 
+        // Fetch all available discounts
+        $discounts = Discount::active($response->statistics['amount_including_vat'])->get();
+
+        // Check if customer is eligible for free shipping
+        foreach ($discounts as $discount) {
+            if ($discount_code == $discount->discount_code || !$discount->discount_code) {
+                if ($discount->free_shipping && $shipping_rate) {
+                    $shipping_rate->rate = 0;
+                }
+            }
+        }
+
         // Create shipping item and calculate VAT
         if ($shipping_rate) {
             $shipping = (object) [
                 'id' => null,
                 'product_id' => null,
+                'type' => 'shipping',
                 'title' => $shipping_rate->title,
                 'price' => (object) [
                     'price' => $shipping_rate->rate,
@@ -266,6 +279,31 @@ class CartController extends Controller
             $response->items[] = $shipping;
         } else {
             $response->items[] = 'select_shipping';
+        }
+
+        $response->statistics['has_discount_applied'] = false;
+
+        foreach ($discounts as $discount) {
+            if ($discount_code == $discount->discount_code || !$discount->discount_code) {
+                $discountAmount = round(-$discount->discount_abs - ($response->statistics['amount_including_vat'] * $discount->discount_perc / 100), 2);
+                $response->statistics['amount_including_vat'] += $discountAmount;
+                $response->statistics['has_discount_applied'] = true;
+                $response->items[] = (object) [
+                    'id' => null,
+                    'product_id' => null,
+                    'type' => 'discount',
+                    'title' => $discount->title . ($discount->discount_code ? ' (' . $discount->discount_code . ')' : ''),
+                    'price' => (object) [
+                        'price' => $discountAmount,
+                        'vat_included' => true,
+                        'vat_rate' => null,
+                        'price_including_vat' => $discountAmount,
+                        'price_excluding_vat' => $discountAmount,
+                        'price_vat' => $discountAmount,
+                    ],
+                    'quantity' => 1,
+                ];
+            }
         }
 
         $response->items = collect($response->items);

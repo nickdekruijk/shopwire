@@ -159,9 +159,9 @@ Add and edit the modules below to your `config/admin.php` file.
         'discounts' => [
             'view' => 'admin::model',
             'icon' => 'fa-shopping-cart',
-            'title_nl' => 'Kortingen en Coupons',
+            'title_nl' => 'Kortingen en codes',
             'model' => 'NickDeKruijk\Shopwire\Models\Discount',
-            'index' => 'title,date_start,date_end,coupon_code,discount_perc,discount_abs,free_shipping,amount_min',
+            'index' => 'title,date_start,date_end,discount_code,discount_perc,discount_abs,free_shipping,amount_min',
             'active' => 'active',
             'orderBy' => 'sort',
             'sortable' => true,
@@ -186,9 +186,9 @@ Add and edit the modules below to your `config/admin.php` file.
                     'index_title_nl' => 'Tot',
                     'validate' => 'nullable|date',
                 ],
-                'coupon_code' => [
-                    'title_nl' => 'Coupon code (leeg indien voor iedereen geldig)',
-                    'index_title_nl' => 'Coupon',
+                'discount_code' => [
+                    'title_nl' => 'Kortingscode (leeg indien voor iedereen geldig)',
+                    'index_title_nl' => 'Kortingscode',
                 ],
                 // 'uses_per_user' => [
                 //     'title_nl' => 'Aantal keer door ingelogde gebruikers te gebruiken (leeg voor onbeperkt)',
@@ -205,7 +205,7 @@ Add and edit the modules below to your `config/admin.php` file.
                     'validate' => 'nullable|numeric',
                 ],
                 // 'apply_to_shipping' => [
-                //     'title_nl' => 'Is de korting  ook van toepassing op verzendkosten?',
+                //     'title_nl' => 'Is de korting ook van toepassing op verzendkosten?',
                 // ],
                 'free_shipping' => [
                     'title_nl' => 'Gratis verzending',

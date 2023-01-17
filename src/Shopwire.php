@@ -7,6 +7,7 @@ use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use NickDeKruijk\Shopwire\Controllers\CartController;
+use NickDeKruijk\Shopwire\Models\Discount;
 use NickDeKruijk\Shopwire\Models\Order;
 
 class Shopwire
@@ -99,5 +100,15 @@ class Shopwire
         $order->save();
         self::session(['order_id' => $order->id]);
         return $order;
+    }
+
+    /**
+     * Check if the shop has active discounts
+     *
+     * @return boolean
+     */
+    public static function hasDiscounts(): bool
+    {
+        return Discount::active()->count() > 0;
     }
 }

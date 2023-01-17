@@ -1,7 +1,7 @@
 <div class="shopwire-checkout">
     <div class="shopwire-checkout-cart">
         <h3>@lang('shopwire::cart.cart')</h3>
-        <table>
+        <table class="shopwire-checkout-cart-table">
             <tr>
                 <th class="shopwire-checkout-product">@lang('shopwire::cart.product')</th>
                 <th class="shopwire-checkout-price">@lang('shopwire::cart.price')</th>
@@ -21,6 +21,13 @@
                         <td class="shopwire-checkout-price">{{ Shopwire::money($product['price']) }}</td>
                         <td class="shopwire-checkout-quantity"><input type="number" wire:model="quantity.{{ $product['id'] }}"></td>
                         <td class="shopwire-checkout-total">{{ Shopwire::money($quantity[$product['id']] * $product['price']) }}</td>
+                    </tr>
+                @elseif (($product['type'] ?? null) == 'discount')
+                    <tr>
+                        <td colspan="3" class="shopwire-checkout-shipping">
+                            {{ $product['title'] }}
+                        </td>
+                        <td class="shopwire-checkout-shipping shopwire-checkout-total">{{ $product['price'] ? Shopwire::money($product['price']) : '' }}</td>
                     </tr>
                 @else
                     <tr>
@@ -73,6 +80,24 @@
                 <td></td>
                 <td colspan="3"><label><input type="checkbox" wire:model="includingVat">@lang('shopwire::cart.vat_toggle')<span></span></label></td>
             </tr>
+            @if (Shopwire::hasDiscounts())
+                @if ($statistics['has_discount_applied'])
+                    <tr>
+                        <td colspan="3"><span class="shopwire-checkout-discount-code" wire:click="discountEnter">@lang('shopwire::cart.discount_code_change')</span></td>
+                    </tr>
+                @else
+                    <tr>
+                        @if ($enter_discount_code)
+                            <td colspan="3" class="shopwire-checkout-discount">
+                                @error('form.discount_code') <span class="shopwire-checkout-form-error">{{ $message }}</span> @enderror
+                                <input type="text" name="discount_code" wire:model.lazy="form.discount_code" placeholder="@lang('shopwire::cart.discount_code')">
+                            </td>
+                        @else
+                            <td colspan="3"><span class="shopwire-checkout-discount-code" wire:click="discountEnter">@lang('shopwire::cart.discount_code_enter')</span></td>
+                        @endif
+                    </tr>
+                @endif
+            @endif
         </table>
         <div class="shopwire-checkout-payment-account">
             <div class="shopwire-checkout-payment">
