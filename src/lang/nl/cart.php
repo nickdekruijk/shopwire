@@ -37,7 +37,7 @@ return [
     'payment' => 'Betaling',
     'payment_method' => 'Betaalwijze',
     'payment_select_issuer' => 'Selecteer bank',
-    'payment_issuer_required' => 'Een bank moet geselecteerd worden',
+    'payment_issuer_required' => 'Een bank selecteren is verplicht.',
     'payment_canceled' => 'Betaling geannuleerd, probeer het nog eens.',
     'payment_failed' => 'Betaling mislukt, probeer het nog eens.',
     'payment_open' => 'Betaling niet afgerond, probeer het nog eens.',
