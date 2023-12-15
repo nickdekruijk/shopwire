@@ -180,7 +180,7 @@ class Checkout extends Component
             $quantity = 0;
         }
         CartController::update($product_id, $quantity);
-        $this->emit('cartUpdate');
+        $this->dispatch('cartUpdate');
     }
 
     public function updatedFormDiscountCode($discount_code)

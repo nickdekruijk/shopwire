@@ -33,7 +33,7 @@ class AddToCart extends Component
         }
         CartController::update($this->product->id, $this->quantity);
         $this->cart_quantity = $this->quantity;
-        $this->emit('cartUpdate');
+        $this->dispatch('cartUpdate');
     }
 
     public function render()

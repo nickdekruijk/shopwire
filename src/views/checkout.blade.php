@@ -19,7 +19,7 @@
                             @endif
                         </td>
                         <td class="shopwire-checkout-price">{{ Shopwire::money($product['price']) }}</td>
-                        <td class="shopwire-checkout-quantity"><input type="number" wire:model="quantity.{{ $product['id'] }}"></td>
+                        <td class="shopwire-checkout-quantity"><input type="number" wire:model.live="quantity.{{ $product['id'] }}"></td>
                         <td class="shopwire-checkout-total">{{ Shopwire::money($quantity[$product['id']] * $product['price']) }}</td>
                     </tr>
                 @elseif (($product['type'] ?? null) == 'discount')
@@ -78,7 +78,7 @@
             @endif
             <tr class="shopwire-checkout-vat-toggle">
                 <td></td>
-                <td colspan="3"><label><input type="checkbox" wire:model="includingVat">@lang('shopwire::cart.vat_toggle')<span></span></label></td>
+                <td colspan="3"><label><input type="checkbox" wire:model.live="includingVat">@lang('shopwire::cart.vat_toggle')<span></span></label></td>
             </tr>
             @if (Shopwire::hasDiscounts())
                 @if ($statistics['has_discount_applied'])
@@ -90,7 +90,7 @@
                         @if ($enter_discount_code)
                             <td colspan="3" class="shopwire-checkout-discount">
                                 @error('form.discount_code') <span class="shopwire-checkout-form-error">{{ $message }}</span> @enderror
-                                <input type="text" name="discount_code" wire:model.lazy="form.discount_code" placeholder="@lang('shopwire::cart.discount_code')">
+                                <input type="text" name="discount_code" wire:model.blur="form.discount_code" placeholder="@lang('shopwire::cart.discount_code')">
                             </td>
                         @else
                             <td colspan="3"><span class="shopwire-checkout-discount-code" wire:click="discountEnter">@lang('shopwire::cart.discount_code_enter')</span></td>
@@ -107,7 +107,7 @@
                     @foreach($payment_methods as $method)
                         <label class="shopwire-checkout-payment-method">
                             @if (count($payment_methods) > 1)
-                                <input type="radio" wire:model="payment_method" value="{{ $method['id'] }}"><span></span>
+                                <input type="radio" wire:model.live="payment_method" value="{{ $method['id'] }}"><span></span>
                             @endif
                             {{ $method['description'] }}
                             @if (isset($method['issuers']) && $payment_method == $method['id'])
@@ -134,10 +134,10 @@
                     <label class="shopwire-checkout-account-email">
                         @error('form.email') <span class="shopwire-checkout-form-error">{{ $message }}</span> @enderror
                         <span class="shopwire-checkout-form-label">@lang('shopwire::cart.email')</span>
-                        <input type="email" wire:model="form.email" placeholder="@lang('shopwire::cart.email')">
+                        <input type="email" wire:model.live="form.email" placeholder="@lang('shopwire::cart.email')">
                     </label>
                     <label class="shopwire-checkout-account-radio">
-                        <input type="radio" wire:model="account" value="login"><span></span> @lang('shopwire::cart.account_login')
+                        <input type="radio" wire:model.live="account" value="login"><span></span> @lang('shopwire::cart.account_login')
                     </label>
                     <div class="{{ $account == 'login' ? 'shopwire-checkout-account-show' : 'shopwire-checkout-account-hide' }}">
                         <label class="shopwire-checkout-account-password">
@@ -148,7 +148,7 @@
                         <button class="shopwire-checkout-button" wire:click="login">@lang('shopwire::cart.login')</button>
                     </div>
                     <label class="shopwire-checkout-account-radio">
-                        <input type="radio" wire:model="account" value="create"><span></span> @lang('shopwire::cart.account_create')
+                        <input type="radio" wire:model.live="account" value="create"><span></span> @lang('shopwire::cart.account_create')
                     </label>
                     <div class="{{ $account == 'create' ? 'shopwire-checkout-account-show' : 'shopwire-checkout-account-hide'}}">
                         <label class="shopwire-checkout-account-password">
@@ -163,7 +163,7 @@
                         </label>
                     </div>
                     <label class="shopwire-checkout-account-radio">
-                        <input type="radio" wire:model="account" value="none"><span></span> @lang('shopwire::cart.account_none')
+                        <input type="radio" wire:model.live="account" value="none"><span></span> @lang('shopwire::cart.account_none')
                     </label>
                 @endif
             </div>
@@ -176,7 +176,7 @@
                 <label class="shopwire-checkout-form-{{ $attributes['type'] }}">
                     @error('form.' . $column) <span class="shopwire-checkout-form-error">{{ $message }}</span> @enderror
                     @if (isset($attributes['columns']) || $attributes['type'] == 'checkbox')
-                        <input type="checkbox" wire:model="form.{{ $column }}"><span></span>
+                        <input type="checkbox" wire:model.live="form.{{ $column }}"><span></span>
                     @endif
                     <span class="shopwire-checkout-form-label">{{ $attributes['label'] }}</span>
                     @if ($attributes['type'] == 'country')
@@ -189,7 +189,7 @@
                     @elseif ($attributes['type'] == 'textarea')
                         <textarea name="{{ $column }}" wire:model="form.{{ $column }}" rows="4" placeholder="{{ $attributes['label'] }}"></textarea>
                     @elseif (!isset($attributes['columns']) && $attributes['type'] != 'checkbox')
-                        <input type="{{ $attributes['type'] }}" name="{{ $column }}" wire:model="form.{{ $column }}" placeholder="{{ $attributes['label'] }}">
+                        <input type="{{ $attributes['type'] }}" name="{{ $column }}" wire:model.live="form.{{ $column }}" placeholder="{{ $attributes['label'] }}">
                     @endif
                 </label>
             @endif
