@@ -1,6 +1,6 @@
 {
     "name": "nickdekruijk/shopwire",
-    "description": "A simple, easy to implement shopping cart and checkout package for Laravel 9 using Livewire.",
+    "description": "A simple, easy to implement shopping cart and checkout package for Laravel using Livewire.",
     "keywords": ["webshop", "shopwire", "laravel", "shop", "cart", "checkout", "livewire", "ecommerce", "shopping", "shoppingcart"],
     "license": "MIT",
     "support": {
