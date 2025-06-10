@@ -210,7 +210,7 @@ class CartController extends Controller
             if ($item->quantity > 0 && $price->vat_rate > $max_vat_rate) {
                 $max_vat_rate = $price->vat_rate;
             }
-            $response->statistics['weight'] += $item->weight * $item->quantity;;
+            $response->statistics['weight'] += $item->product->weight * $item->quantity;;
 
             $response->statistics['count'] += $item->quantity;
             $response->statistics['count_unique']++;
