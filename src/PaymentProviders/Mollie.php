@@ -77,7 +77,7 @@ class Mollie extends PaymentProvider
                 'id' => $method->id,
                 'description' => $method->description,
             ];
-            if ($method->issuers) {
+            if ($method->issuers && $method->id !== 'ideal') {
                 $methods[$method->id]['issuers'] = [];
                 foreach ($method->issuers as $issuer) {
                     $methods[$method->id]['issuers'][$issuer->id] = $issuer->name;
