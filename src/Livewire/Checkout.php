@@ -251,7 +251,7 @@ class Checkout extends Component
             'form.email' => 'required|email',
             'shipping' => 'required',
             'payment_method' => 'required',
-            'payment_issuer' => 'required_if:payment_method,ideal',
+            // 'payment_issuer' => 'required_if:payment_method,ideal',
             'form.discount_code' => [new DiscountCodeValid],
         ];
 
