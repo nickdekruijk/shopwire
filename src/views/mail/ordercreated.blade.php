@@ -4,6 +4,10 @@
 {!! $order->html !!}<br>
 
 <table>
+    <tr>
+        <td>@lang('shopwire::mail.order_number')</td>
+        <td>{{ $order->id }}</td>
+    </tr>
     @foreach ($order->customerSorted as $key => $value)
         <tr>
             <td>{{ ucfirst(str_replace('_', ' ', $key)) }}</td>
