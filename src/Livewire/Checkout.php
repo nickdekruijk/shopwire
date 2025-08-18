@@ -89,7 +89,7 @@ class Checkout extends Component
         $this->cartUpdate();
 
         // Get and cache the payment methods
-        $this->payment_methods = cache()->remember(config('shopwire.cache_prefix') . 'payment_methods', config('shopwire.cache_duration'), fn () => PaymentController::methods());
+        $this->payment_methods = cache()->remember(config('shopwire.cache_prefix') . 'payment_methods', config('shopwire.cache_duration'), fn() => PaymentController::methods());
 
         // Get the payment method and issuer from session
         $this->payment_method = Shopwire::session('checkout_payment_method');
