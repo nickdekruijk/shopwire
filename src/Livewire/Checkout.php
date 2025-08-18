@@ -128,7 +128,6 @@ class Checkout extends Component
                 ];
             }
         }
-        $this->show_zero = true;
         $this->statistics = $cart->statistics;
         $this->shipping_options = $cart->shipping_options;
         if (count($this->shipping_options) == 1) {
