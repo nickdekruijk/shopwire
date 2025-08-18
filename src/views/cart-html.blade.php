@@ -5,7 +5,7 @@
         <th align="center" class="shopwire-checkout-quantity">@lang('shopwire::cart.quantity')</th>
         <th align="right" class="shopwire-checkout-total">@lang('shopwire::cart.total')</th>
     </tr>
-    @foreach($cart->items as $item)
+    @foreach ($cart->items as $item)
         @if ($item->product_id)
             <tr>
                 <td class="shopwire-checkout-product">{{ $item->title }}</td>
