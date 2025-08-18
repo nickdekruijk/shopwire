@@ -32,6 +32,7 @@ class OrderConfirmation extends Mailable
     {
         return $this
             ->markdown('shopwire::mail.orderconfirmation')
+            ->subject(__('shopwire::mail.webshop_order') . ' #' . $this->order->id)
             ->to($this->order->customer['email'], $this->order->customer['firstname'] . ' ' . $this->order->customer['lastname'])
             ->from(config('shopwire.email_from.address'), config('shopwire.email_from.name'));
     }

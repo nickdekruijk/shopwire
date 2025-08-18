@@ -12,4 +12,6 @@ return [
     'sender_name' => config('shopwire.email_from.name'),
 
     'new_order_from' => 'New order from ',
+    'new_webshop_order' => 'New webshop order',
+    'webshop_order' => 'Webshop order',
 ];

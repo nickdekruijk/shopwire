@@ -32,6 +32,7 @@ class OrderCreated extends Mailable
     {
         return $this
             ->markdown('shopwire::mail.ordercreated')
+            ->subject(__('shopwire::mail.new_webshop_order') . ' #' . $this->order->id)
             ->to(config('shopwire.owner_email.address'), config('shopwire.owner_email.name'))
             ->replyTo($this->order->customer['email'], $this->order->customer['firstname'] . ' ' . $this->order->customer['lastname'])
             ->from(config('shopwire.email_from.address'), config('shopwire.email_from.name'));
