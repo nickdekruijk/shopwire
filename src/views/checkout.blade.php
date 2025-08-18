@@ -10,7 +10,7 @@
             </tr>
             @foreach($items as $product)
                 @if ($product['id'])
-                    <tr>
+                    <tr wire:key="product-{{ $product['id'] }}">
                         <td class="shopwire-checkout-product">
                             @if ($product['url'])
                                 <a href="{{ $product['url'] }}">{{ $product['title'] }}</a>
