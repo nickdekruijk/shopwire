@@ -85,7 +85,7 @@ class Shopwire
      * @param string|null $payment_id
      * @return Order
      */
-    public static function order(string $payment_id = null): Order
+    public static function order(string|null $payment_id = null): Order
     {
         $model = config('shopwire.order_model');
         if ($payment_id) {
