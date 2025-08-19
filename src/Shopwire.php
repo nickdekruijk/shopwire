@@ -98,6 +98,7 @@ class Shopwire
         }
         $order = new $model;
         $order->save();
+        Shopwire::log('notice', 'New order: ' . $order->id);
         self::session(['order_id' => $order->id]);
         return $order;
     }
