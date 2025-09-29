@@ -7,6 +7,7 @@ use NickDeKruijk\Shopwire\Controllers\CartController;
 
 class Cart extends Component
 {
+    public $icon = null;
     public $blade_icon = null;
     public $count = 0;
     public $unique = false;
