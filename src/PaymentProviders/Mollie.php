@@ -72,7 +72,7 @@ class Mollie extends PaymentProvider
     {
         $methods = [];
 
-        foreach (mollie()->methods->allActive(['include' => 'pricing,issuers']) as $method) {
+        foreach (\Mollie\Laravel\Facades\Mollie::api()->methods->allActive(['include' => 'pricing,issuers']) as $method) {
             $methods[$method->id] = [
                 'id' => $method->id,
                 'description' => $method->description,
