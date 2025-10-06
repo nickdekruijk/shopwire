@@ -216,6 +216,9 @@ class CartController extends Controller
             $response->statistics['count_unique']++;
         }
 
+        // Amount only items is used for discounts that should not apply to shipping costs
+        $response->statistics['amount_only_items'] = $response->statistics['amount_including_vat'];
+
         // Fetch all available shipping rates
         $shipping_rates = ShippingRate::valid($response->statistics['amount_including_vat'], $response->statistics['weight'], $cart->country_code)->get();
 
@@ -285,7 +288,7 @@ class CartController extends Controller
 
         foreach ($discounts as $discount) {
             if ($discount_code == $discount->discount_code || !$discount->discount_code) {
-                $discountAmount = round(-$discount->discount_abs - ($response->statistics['amount_including_vat'] * $discount->discount_perc / 100), 2);
+                $discountAmount = round(-$discount->discount_abs - ($discount['apply_to_shipping'] ? $response->statistics['amount_including_vat'] : $response->statistics['amount_only_items']) * $discount->discount_perc / 100, 2);
                 $response->statistics['amount_including_vat'] += $discountAmount;
                 $response->statistics['has_discount_applied'] = true;
                 $response->items[] = (object) [
