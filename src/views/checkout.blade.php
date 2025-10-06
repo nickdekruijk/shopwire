@@ -198,7 +198,7 @@
                         @endif
                         <span class="shopwire-checkout-form-label">{{ $attributes['label'] }}</span>
                         @if ($attributes['type'] == 'country')
-                            <span class="shopwire-checkout-select"><select name="{{ $column }}" wire:model="form.{{ $column }}">
+                            <span class="shopwire-checkout-select"><select name="{{ $column }}" wire:model.live="form.{{ $column }}">
                                     <option value="">@lang('shopwire::cart.select_country')</option>
                                     @foreach ($countries as $code => $country)
                                         <option value="{{ $code }}">{{ $country }}</option>
