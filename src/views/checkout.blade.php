@@ -20,7 +20,7 @@
                         </td>
                         <td class="shopwire-checkout-price">{{ Shopwire::money($product['price']) }}</td>
                         <td class="shopwire-checkout-quantity"><input type="number" wire:model.live="quantity.{{ $product['id'] }}"></td>
-                        <td class="shopwire-checkout-total">{{ Shopwire::money($quantity[$product['id']] * $product['price']) }}</td>
+                        <td class="shopwire-checkout-total">{{ Shopwire::money((int) $quantity[$product['id']] * $product['price']) }}</td>
                     </tr>
                 @elseif (($product['type'] ?? null) == 'discount')
                     <tr>
