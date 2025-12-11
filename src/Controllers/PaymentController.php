@@ -82,6 +82,9 @@ class PaymentController extends Controller
      */
     public function verify()
     {
+        // Verify should only be called if there is an order in session
+        abort_if(!Shopwire::session('order_id'), 404);
+
         $order = Shopwire::order();
         $payment = self::payment($order->payment_id);
         if ($payment->paid) {
