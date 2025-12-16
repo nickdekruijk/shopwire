@@ -54,7 +54,7 @@ class CartController extends Controller
             if (Shopwire::auth()->check()) {
                 $cart->user_id = Shopwire::auth()->user()->id;
             }
-            $cart->country_code = Location::get()->countryCode;
+            $cart->country_code = Location::get()->countryCode ?? null;
 
             $cart->save();
             // Store the id in the session for performance
