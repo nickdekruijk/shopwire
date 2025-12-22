@@ -328,7 +328,7 @@ class Checkout extends Component
 
         // Attach OrderLine rows
         $order->lines()->delete();
-        foreach ($cart->items as $item) {
+        foreach ($cart->items->where('quantity', '!=', 0) as $item) {
             $orderline = new Orderline;
             $orderline->order_id = $order->id;
             $orderline->product_id = $item->product_id ?? null;
