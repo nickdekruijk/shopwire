@@ -9,8 +9,8 @@ class Cart extends Component
 {
     public $icon = null;
     public $blade_icon = null;
-    public $count = 0;
-    public $unique = false;
+    public int $count = 0;
+    public bool $unique = false;
 
     protected $listeners = [
         'cartUpdate',
