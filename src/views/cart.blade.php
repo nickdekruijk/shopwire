@@ -3,7 +3,7 @@
         <img src="{{ $icon }}" alt="" class="shopwire-cart-icon">
     @endisset
     @isset($blade_icon)
-        @svg($blade_icon, 'shopwire-cart-icon')
+        @svg((string) $blade_icon, 'shopwire-cart-icon')
     @endisset
     @if ($count)
         <span class="shopwire-cart-count">{{ $count }}</span>
