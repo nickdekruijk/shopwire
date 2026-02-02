@@ -2,6 +2,7 @@
 
 namespace NickDeKruijk\Shopwire\Livewire;
 
+use Livewire\Attributes\Locked;
 use Livewire\Component;
 use NickDeKruijk\Shopwire\Controllers\CartController;
 
@@ -9,6 +10,8 @@ class Cart extends Component
 {
     public $icon = null;
     public $blade_icon = null;
+
+    #[Locked]
     public int $count = 0;
     public bool $unique = false;
 
