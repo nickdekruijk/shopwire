@@ -202,6 +202,7 @@ class Checkout extends Component
 
     public function login()
     {
+        $this->validateOnly('form.email');
         if (!Shopwire::auth()->attempt(['email' => $this->form['email'], 'password' => $this->form['password']])) {
             $this->addError('form.email', __('shopwire::cart.login_invalid'));
             $this->addError('form.password', __('shopwire::cart.login_invalid'));
