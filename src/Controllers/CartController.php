@@ -185,8 +185,8 @@ class CartController extends Controller
         // Used for tracking the highest VAT rate to calculate shipping costs
         $max_vat_rate = 0;
 
-        // Check if product_option is used
-        $with = ['product'];
+        // Eager load these relationships
+        $with = ['product', 'product.shopwire_vat'];
 
         // Walk thru all items in the cart and calculate VAT
         foreach ($cart->items()->with($with)->get() as $item) {
