@@ -8,11 +8,16 @@ use NickDeKruijk\Shopwire\Controllers\CartController;
 
 class Cart extends Component
 {
+    #[Locked]
     public $icon = null;
+
+    #[Locked]
     public $blade_icon = null;
 
     #[Locked]
     public int $count = 0;
+
+    #[Locked]
     public bool $unique = false;
 
     protected $listeners = [

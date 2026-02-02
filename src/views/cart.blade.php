@@ -1,9 +1,9 @@
 <a class="shopwire-cart shopwire-cart-{{ $count }}" href="{{ config('shopwire.checkout_url') }}">
     @isset($icon)
-        <img src="{{ (string) $icon }}" alt="" class="shopwire-cart-icon">
+        <img src="{{ $icon }}" alt="" class="shopwire-cart-icon">
     @endisset
     @isset($blade_icon)
-        @svg((string) $blade_icon, 'shopwire-cart-icon')
+        @svg($blade_icon, 'shopwire-cart-icon')
     @endisset
     @if ($count)
         <span class="shopwire-cart-count">{{ $count }}</span>
