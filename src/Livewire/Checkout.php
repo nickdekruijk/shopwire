@@ -4,6 +4,7 @@ namespace NickDeKruijk\Shopwire\Livewire;
 
 use Countries;
 use Illuminate\Validation\Rules\Password;
+use Livewire\Attributes\Locked;
 use Livewire\Component;
 use NickDeKruijk\Shopwire\Controllers\CartController;
 use NickDeKruijk\Shopwire\Controllers\PaymentController;
@@ -13,22 +14,34 @@ use NickDeKruijk\Shopwire\Shopwire;
 
 class Checkout extends Component
 {
-    public $account;
-    public $statistics;
-    public $items;
-    public $quantity = [];
-    public $includingVat = true;
-    public $show_zero = false;
+    // User-editable, bound via wire:model in the checkout view.
+    public ?string $account = null;
+    public array $quantity = [];
+    public bool $includingVat = true;
+    public array $form = [];
+    public ?string $payment_method = null;
+    public ?string $payment_issuer = null;
     public $shipping;
-    public $shipping_options;
-    public $countries;
-    public $form;
-    public $form_columns = [];
-    public $form_groups = [];
-    public $payment_methods;
-    public $payment_method;
-    public $payment_issuer;
-    public $enter_discount_code;
+
+    // Server-computed or passed-in; not editable from the client.
+    #[Locked]
+    public bool $show_zero = false;
+    #[Locked]
+    public array $statistics = [];
+    #[Locked]
+    public array $items = [];
+    #[Locked]
+    public array $shipping_options = [];
+    #[Locked]
+    public array $countries = [];
+    #[Locked]
+    public array $form_columns = [];
+    #[Locked]
+    public array $form_groups = [];
+    #[Locked]
+    public array $payment_methods = [];
+    #[Locked]
+    public bool $enter_discount_code = false;
 
     protected $listeners = [
         'cartUpdate' => 'cartUpdate',
@@ -40,7 +53,7 @@ class Checkout extends Component
         $this->countries = Countries::getList(app()->getLocale());
 
         // Get stored form values from session
-        $this->form = Shopwire::session('checkout_form');
+        $this->form = Shopwire::session('checkout_form') ?? [];
 
         // If user is loggedin set account to 'login' else get account method from session
         if (Shopwire::auth()->check()) {

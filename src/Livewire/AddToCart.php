@@ -2,14 +2,19 @@
 
 namespace NickDeKruijk\Shopwire\Livewire;
 
+use Livewire\Attributes\Locked;
 use Livewire\Component;
 use NickDeKruijk\Shopwire\Controllers\CartController;
 
 class AddToCart extends Component
 {
+    #[Locked]
     public $product;
-    public $quantity = 1;
-    public $cart_quantity = 0;
+
+    public int $quantity = 1;
+
+    #[Locked]
+    public int $cart_quantity = 0;
 
     public function mount($product)
     {
