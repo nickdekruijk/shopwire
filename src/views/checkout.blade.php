@@ -94,7 +94,7 @@
                                 @error('form.discount_code')
                                     <span class="shopwire-checkout-form-error">{{ $message }}</span>
                                 @enderror
-                                <input type="text" name="discount_code" wire:model.blur="form.discount_code" placeholder="@lang('shopwire::cart.discount_code')">
+                                <input type="text" name="discount_code" wire:model.live.blur="form.discount_code" placeholder="@lang('shopwire::cart.discount_code')">
                             </td>
                         @else
                             <td colspan="3"><span class="shopwire-checkout-discount-code" wire:click="discountEnter">@lang('shopwire::cart.discount_code_enter')</span></td>
