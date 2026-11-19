@@ -81,18 +81,26 @@ class PaymentController extends Controller
         $order->refresh();
         Shopwire::log('info', 'Verified payment: ' . $order->payment_id);
 
+        // The order is paid from here on and this code never runs again for it,
+        // so every step below is guarded on its own: a failing step is reported
+        // but must not prevent the steps after it.
         if (config('shopwire.decrease_stock')) {
-            $order->decreaseStock();
+            try {
+                $order->decreaseStock();
+            } catch (Throwable $e) {
+                report($e);
+                Shopwire::log('error', 'Decreasing stock failed for order ' . $order->id . ': ' . $e->getMessage());
+            }
         }
 
-        // A failing mail must not undo or block the paid status
-        try {
-            Mail::send((new (config('shopwire.mailable_customer'))($order)));
-            Mail::send((new (config('shopwire.mailable_owner'))($order)));
-            Shopwire::log('info', 'Mails sent: ' . $order->customer['email']);
-        } catch (Throwable $e) {
-            report($e);
-            Shopwire::log('error', 'Sending order mails failed for order ' . $order->id . ': ' . $e->getMessage());
+        foreach (['mailable_customer', 'mailable_owner'] as $mailable) {
+            try {
+                Mail::send((new (config('shopwire.' . $mailable))($order)));
+                Shopwire::log('info', 'Mail sent (' . $mailable . '): ' . $order->customer['email']);
+            } catch (Throwable $e) {
+                report($e);
+                Shopwire::log('error', 'Sending mail (' . $mailable . ') failed for order ' . $order->id . ': ' . $e->getMessage());
+            }
         }
 
         event(new OrderPaid($order));

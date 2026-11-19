@@ -6,7 +6,10 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Schema;
 use Livewire\LivewireServiceProvider;
+use Monarobase\CountryList\CountryList;
+use Monarobase\CountryList\CountryListFacade;
 use Monolog\Handler\NullHandler;
+use NickDeKruijk\Shopwire\ShopwireFacade;
 use NickDeKruijk\Shopwire\ShopwireServiceProvider;
 use NickDeKruijk\Shopwire\Tests\Fixtures\FakePaymentProvider;
 use NickDeKruijk\Shopwire\Tests\Fixtures\Product;
@@ -24,6 +27,14 @@ abstract class TestCase extends Orchestra
         ];
     }
 
+    protected function getPackageAliases($app)
+    {
+        return [
+            'Countries' => CountryListFacade::class,
+            'Shopwire' => ShopwireFacade::class,
+        ];
+    }
+
     protected function defineEnvironment($app)
     {
         $app['config']->set('app.debug', true);
@@ -35,6 +46,10 @@ abstract class TestCase extends Orchestra
         ]);
         $app['config']->set('shopwire.product_model', Product::class);
         $app['config']->set('shopwire.payment_provider', FakePaymentProvider::class);
+
+        // The country list looks for its data in the application's vendor directory,
+        // which is the Testbench skeleton here. Point it to this package's instead.
+        $app->singleton(CountryList::class, fn() => new CountryList(__DIR__ . '/../vendor/umpirsky/country-list/data'));
     }
 
     protected function defineDatabaseMigrations()

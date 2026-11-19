@@ -28,6 +28,7 @@ class FakePaymentProvider extends PaymentProvider
 
     public function methods()
     {
-        return ['ideal' => 'iDEAL'];
+        // Same shape as the Mollie provider returns
+        return ['ideal' => ['id' => 'ideal', 'description' => 'iDEAL']];
     }
 }

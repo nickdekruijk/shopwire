@@ -98,10 +98,10 @@ return [
     |--------------------------------------------------------------------------
     | decrease_stock
     |--------------------------------------------------------------------------
-    | When enabled the stock column of each ordered product (or product option
-    | when product_option_model and product_option_columns.stock are set) is
-    | decreased once the order is paid. Products with a null stock value are
-    | treated as unlimited and left untouched.
+    | When enabled the stock column of each ordered product is decreased once
+    | the order is paid. Products with a null stock value are treated as
+    | unlimited and left untouched. Stock is not checked during checkout, so
+    | it can become negative when more is sold than is available.
     */
     'decrease_stock' => false,
 

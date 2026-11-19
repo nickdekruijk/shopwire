@@ -63,7 +63,9 @@ You need to make a logging channel called shopwire, add something like this to `
 ```
 
 ## Stock
-Set `decrease_stock` to `true` in the config to decrease the stock column of each ordered product once the order is paid. Products with a `null` stock value are treated as unlimited. When `product_option_model` and `product_option_columns.stock` are configured the stock of the product option is decreased instead.
+Set `decrease_stock` to `true` in the config to decrease the stock column of each ordered product once the order is paid. Products with a `null` stock value are treated as unlimited.
+
+Stock is not checked during checkout, so it can become negative when more is sold than is available. Decreasing the stock of a product option is prepared in `Order::decreaseStock()` but not active yet: the cart does not pass a product option to the order.
 
 ## Events
 Shopwire dispatches these events you can listen to, for example to create invoices or start fulfilment:

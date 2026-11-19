@@ -1,6 +1,10 @@
 <?php
 
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Mail;
+use NickDeKruijk\Shopwire\Events\OrderPaid;
+use NickDeKruijk\Shopwire\Mail\OrderConfirmation;
+use NickDeKruijk\Shopwire\Mail\OrderCreated;
 use NickDeKruijk\Shopwire\Models\Order;
 use NickDeKruijk\Shopwire\Models\OrderLine;
 use NickDeKruijk\Shopwire\Tests\Fixtures\FakePaymentProvider;
@@ -73,4 +77,18 @@ it('does not decrease stock when payment failed', function () {
     $this->post('/shopwire/payment/webhook', ['id' => $order->payment_id]);
 
     expect((float) $product->fresh()->stock)->toBe(10.0);
+});
+
+it('keeps the order paid, sends the mails and dispatches the event when decreasing stock fails', function () {
+    Event::fake([OrderPaid::class]);
+    config(['shopwire.decrease_stock' => true, 'shopwire.product_columns.stock' => 'missing_column']);
+    $product = Product::create(['title' => 'Shirt', 'stock' => 10]);
+    $order = orderWithLines([['product_id' => $product->id, 'quantity' => 3]]);
+
+    $this->post('/shopwire/payment/webhook', ['id' => $order->payment_id])->assertOk();
+
+    expect($order->fresh()->paid)->toBeTrue();
+    Mail::assertSent(OrderConfirmation::class, 1);
+    Mail::assertSent(OrderCreated::class, 1);
+    Event::assertDispatchedTimes(OrderPaid::class, 1);
 });
