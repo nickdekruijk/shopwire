@@ -53,4 +53,8 @@ return [
     'vatExcl' => 'VAT Excluded',
     'vat_toggle' => 'Show including VAT',
     'webshop_order' => 'Webshop order #',
+    'option' => 'Variant',
+    'select_option' => 'Select a variant',
+    'stock_limited' => 'Only :stock left in stock.',
+    'out_of_stock' => 'Sold out',
 ];

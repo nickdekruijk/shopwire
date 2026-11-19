@@ -20,6 +20,8 @@ class CreateProductOptionsTable extends Migration
             $table->string('title')->nullable();
             $table->string('description')->nullable();
             $table->decimal('price', 10, 2)->nullable()->index();
+            $table->decimal('stock', 8, 2)->nullable();
+            $table->decimal('weight', 8, 2)->nullable();
             $table->bigInteger('sort')->nullable()->unsigned()->index();
             $table->timestamps();
         });
