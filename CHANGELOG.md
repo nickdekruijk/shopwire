@@ -5,6 +5,22 @@ All notable changes to `nickdekruijk/shopwire` are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.1] - 2026-11-19
+
+### Fixed
+
+- **A discount code is only accepted when the cart applies it.** The validation compared
+  the minimum and maximum amount of a discount with the total amount, including shipping.
+  The cart compares them with the products only. With 45 euro of products, 6 euro shipping
+  and a code with a minimum of 50 euro, the code was accepted without an error but no
+  discount was given. Both now use the products without shipping.
+
+### Added
+
+- **Dutch example discounts.** The `DiscountsDutch` seeder creates four example discounts:
+  free shipping with and without a code, a percentage and a fixed amount. They are all
+  inactive, and existing discounts are left alone.
+
 ## [0.5.0] - 2026-11-19
 
 ### Fixed
