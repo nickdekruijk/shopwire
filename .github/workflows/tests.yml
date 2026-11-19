@@ -1,0 +1,44 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - php: '8.2'
+            laravel: '12.*'
+            testbench: '10.*'
+            livewire: '3.*'
+          - php: '8.3'
+            laravel: '12.*'
+            testbench: '10.*'
+            livewire: '4.*'
+          - php: '8.4'
+            laravel: '13.*'
+            testbench: '11.*'
+            livewire: '4.*'
+
+    name: PHP ${{ matrix.php }} - Laravel ${{ matrix.laravel }} - Livewire ${{ matrix.livewire }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: pdo_sqlite, intl
+          coverage: none
+
+      - name: Install dependencies
+        run: |
+          composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" "livewire/livewire:${{ matrix.livewire }}" --no-interaction --no-update
+          composer update --prefer-dist --no-interaction --with-all-dependencies
+
+      - name: Run tests
+        run: vendor/bin/pest

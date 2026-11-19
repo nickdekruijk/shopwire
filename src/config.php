@@ -90,9 +90,20 @@ return [
         'title' => 'title',
         'price' => 'price',
         'vat' => 'vat_id',    // Must match id from shopwire_vats table
-        'stock' => 'stock',   // Will decrease after payment is successful 
+        'stock' => 'stock',   // Decreased after successful payment when decrease_stock is enabled
         'weight' => 'weight', // Weight in grams, used to calculate shipping
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | decrease_stock
+    |--------------------------------------------------------------------------
+    | When enabled the stock column of each ordered product (or product option
+    | when product_option_model and product_option_columns.stock are set) is
+    | decreased once the order is paid. Products with a null stock value are
+    | treated as unlimited and left untouched.
+    */
+    'decrease_stock' => false,
 
     /*
     |--------------------------------------------------------------------------

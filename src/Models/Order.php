@@ -32,6 +32,41 @@ class Order extends Model
         return $this->hasMany(OrderLine::class);
     }
 
+    /**
+     * Decrease the stock of the ordered products (and product options when
+     * configured). Products with a null stock value are treated as unlimited
+     * and left untouched. Called after payment when shopwire.decrease_stock
+     * is enabled.
+     *
+     * @return void
+     */
+    public function decreaseStock(): void
+    {
+        $productModel = config('shopwire.product_model');
+        $productColumn = config('shopwire.product_columns.stock');
+        $optionModel = config('shopwire.product_option_model');
+        $optionColumn = config('shopwire.product_option_columns.stock');
+
+        foreach ($this->lines as $line) {
+            // Skip shipping, discount and other non-product lines
+            if (!($line->product_id > 0) || $line->quantity <= 0) {
+                continue;
+            }
+
+            if ($line->product_option_id && $optionModel && $optionColumn) {
+                (new $optionModel)->newQueryWithoutScopes()
+                    ->whereKey($line->product_option_id)
+                    ->whereNotNull($optionColumn)
+                    ->decrement($optionColumn, $line->quantity);
+            } elseif ($productModel && $productColumn) {
+                (new $productModel)->newQueryWithoutScopes()
+                    ->whereKey($line->product_id)
+                    ->whereNotNull($productColumn)
+                    ->decrement($productColumn, $line->quantity);
+            }
+        }
+    }
+
     public function getQuarterAttribute($value)
     {
         $quarter = $this->created_at->format('Y') . '-' . (ceil($this->created_at->format('m') / 3));

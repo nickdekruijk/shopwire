@@ -8,6 +8,7 @@ use Livewire\Attributes\Locked;
 use Livewire\Component;
 use NickDeKruijk\Shopwire\Controllers\CartController;
 use NickDeKruijk\Shopwire\Controllers\PaymentController;
+use NickDeKruijk\Shopwire\Events\PaymentCreated;
 use NickDeKruijk\Shopwire\Models\OrderLine;
 use NickDeKruijk\Shopwire\Rules\DiscountCodeValid;
 use NickDeKruijk\Shopwire\Shopwire;
@@ -369,6 +370,8 @@ class Checkout extends Component
         $order->payment_id = $payment->id;
         $order->payment_method = $this->payment_method;
         $order->save();
+
+        event(new PaymentCreated($order, $payment));
 
         // Redirect to payment provider
         Shopwire::log('info', 'Payment redirect: ' . $order->id . ' ' . $order->payment_id . ' ' . $order->customer['email'] . ' ' . $payment->webhookUrl);
