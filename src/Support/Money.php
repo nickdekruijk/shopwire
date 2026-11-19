@@ -61,6 +61,32 @@ final class Money
     }
 
     /**
+     * Split an amount in cents proportionally over weighted keys (e.g. VAT
+     * rates). The shares always add up exactly to the amount; any rounding
+     * remainder goes to the key with the largest weight. Keys with a zero or
+     * negative weight are ignored, so an empty array is returned when there
+     * is nothing to split over.
+     */
+    public static function allocate(int $cents, array $weights): array
+    {
+        $weights = array_filter($weights, fn($weight) => $weight > 0);
+        $total = array_sum($weights);
+        if ($total <= 0) {
+            return [];
+        }
+
+        $shares = [];
+        foreach ($weights as $key => $weight) {
+            $shares[$key] = self::round($cents * $weight / $total);
+        }
+
+        $largest = array_search(max($weights), $weights);
+        $shares[$largest] += $cents - array_sum($shares);
+
+        return $shares;
+    }
+
+    /**
      * Round to whole cents. The value is first rounded to 6 decimals to absorb
      * floating point noise, so 1234.4999999999 is treated as 1234.5 and becomes 1235.
      */

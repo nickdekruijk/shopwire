@@ -80,3 +80,59 @@ it('calculates order VAT totals exactly', function () {
     expect($order->amount_vat)->toBe(0.09)
         ->and($order->amount_excl_vat)->toBe(0.41);
 });
+
+function discount(array $attributes): void
+{
+    $discount = new \NickDeKruijk\Shopwire\Models\Discount;
+    $discount->forceFill(array_merge(['title' => 'Korting', 'active' => true], $attributes))->save();
+}
+
+it('lowers the amount excluding VAT and the VAT with a percentage discount', function () {
+    $vat = vat(21, true);
+    $shirt = Product::create(['title' => 'Shirt', 'price' => '121.00', 'vat_id' => $vat->id]);
+    discount(['discount_perc' => 10]);
+    cartWith([[$shirt, 1]]);
+
+    $cart = CartController::getItems();
+    $line = $cart->items->firstWhere('type', 'discount');
+
+    expect($cart->statistics['amount_including_vat'])->toBe(108.9)
+        ->and($cart->statistics['amount_excluding_vat'])->toBe(90.0)
+        ->and(array_values($cart->statistics['amount_vat']))->toBe([18.9])
+        ->and($line->price->price_including_vat)->toBe(-12.1)
+        ->and($line->price->price_excluding_vat)->toBe(-10.0)
+        ->and($line->price->price_vat)->toBe(-2.1);
+});
+
+it('spreads a fixed discount over multiple VAT rates', function () {
+    $high = vat(21, true);
+    $low = vat(9, true);
+    $shirt = Product::create(['title' => 'Shirt', 'price' => '121.00', 'vat_id' => $high->id]);
+    $book = Product::create(['title' => 'Boek', 'price' => '109.00', 'vat_id' => $low->id]);
+    discount(['discount_abs' => 23]);
+    cartWith([[$shirt, 1], [$book, 1]]);
+
+    $cart = CartController::getItems();
+    $line = $cart->items->firstWhere('type', 'discount');
+
+    expect($cart->statistics['amount_including_vat'])->toBe(207.0)
+        ->and($cart->statistics['amount_excluding_vat'])->toBe(180.0)
+        ->and(array_values($cart->statistics['amount_vat']))->toBe([18.9, 8.1])
+        ->and($line->price->vat_rate)->toBeNull()
+        ->and($line->price->price_vat)->toBe(-3.0);
+});
+
+it('keeps totals consistent when a discount does not split evenly', function () {
+    $high = vat(21, true);
+    $low = vat(9, true);
+    $a = Product::create(['title' => 'A', 'price' => '10.00', 'vat_id' => $high->id]);
+    $b = Product::create(['title' => 'B', 'price' => '10.00', 'vat_id' => $low->id]);
+    discount(['discount_abs' => '0.01']);
+    cartWith([[$a, 1], [$b, 1]]);
+
+    $statistics = CartController::getItems()->statistics;
+    $vat = array_sum(array_map(fn($amount) => (int) round($amount * 100), $statistics['amount_vat']));
+
+    expect($statistics['amount_including_vat'])->toBe(19.99)
+        ->and((int) round($statistics['amount_including_vat'] * 100) - (int) round($statistics['amount_excluding_vat'] * 100))->toBe($vat);
+});

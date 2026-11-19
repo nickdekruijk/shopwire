@@ -22,3 +22,9 @@ it('multiplies and takes percentages', function () {
         ->and(Money::multiply(333, '1.5'))->toBe(500)
         ->and(Money::percentage(1999, 10))->toBe(200);
 });
+
+it('allocates an amount proportionally without losing cents', function () {
+    expect(Money::allocate(-2300, ['21.00' => 12100, '9.00' => 10900]))->toBe(['21.00' => -1210, '9.00' => -1090])
+        ->and(array_sum(Money::allocate(100, ['a' => 1, 'b' => 1, 'c' => 1])))->toBe(100)
+        ->and(Money::allocate(100, ['a' => 0]))->toBe([]);
+});
