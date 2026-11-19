@@ -191,6 +191,7 @@ class CartController extends Controller
         $excluding_cents = 0;
         $vat_cents = [];
         $rate_including_cents = [];
+        $rate_excluding_cents = [];
 
         // Eager load these relationships
         $with = ['product', 'product.shopwire_vat'];
@@ -216,6 +217,7 @@ class CartController extends Controller
             $excluding_cents += $line_excluding;
             $vat_cents[$price->vat_rate] = ($vat_cents[$price->vat_rate] ?? 0) + $line_including - $line_excluding;
             $rate_including_cents[$price->vat_rate] = ($rate_including_cents[$price->vat_rate] ?? 0) + $line_including;
+            $rate_excluding_cents[$price->vat_rate] = ($rate_excluding_cents[$price->vat_rate] ?? 0) + $line_excluding;
 
             if ($item->quantity > 0 && $price->vat_rate > $max_vat_rate) {
                 $max_vat_rate = $price->vat_rate;
@@ -229,6 +231,7 @@ class CartController extends Controller
         // Amount only items is used for discounts that should not apply to shipping costs
         $items_cents = $including_cents;
         $items_rate_including_cents = $rate_including_cents;
+        $items_rate_excluding_cents = $rate_excluding_cents;
         $response->statistics['amount_including_vat'] = Money::fromCents($including_cents);
         $response->statistics['amount_excluding_vat'] = Money::fromCents($excluding_cents);
         $response->statistics['amount_only_items'] = $response->statistics['amount_including_vat'];
@@ -296,6 +299,7 @@ class CartController extends Controller
             }
             $vat_cents[$max_vat_rate] = ($vat_cents[$max_vat_rate] ?? 0) + $shipping_including - $shipping_excluding;
             $rate_including_cents[$max_vat_rate] = ($rate_including_cents[$max_vat_rate] ?? 0) + $shipping_including;
+            $rate_excluding_cents[$max_vat_rate] = ($rate_excluding_cents[$max_vat_rate] ?? 0) + $shipping_excluding;
 
             $including_cents += $shipping_including;
             $excluding_cents += $shipping_excluding;
@@ -316,13 +320,25 @@ class CartController extends Controller
 
                 // Spread the discount over the VAT rates it applies to, proportional to their amounts,
                 // so the discount also lowers the amount excluding VAT and the VAT per rate
-                $shares = Money::allocate($discount_cents, $discount['apply_to_shipping'] ? $rate_including_cents : $items_rate_including_cents);
+                $base_including = $discount['apply_to_shipping'] ? $rate_including_cents : $items_rate_including_cents;
+                $base_excluding = $discount['apply_to_shipping'] ? $rate_excluding_cents : $items_rate_excluding_cents;
+                $shares = Money::allocate($discount_cents, $base_including);
                 $discount_excluding_cents = 0;
+                $vat_shares = [];
                 foreach ($shares as $rate => $share) {
-                    $share_excluding = Money::excludingVat($share, $rate);
+                    // Use the rate's own excluding/including ratio instead of the VAT percentage. Prices are
+                    // rounded per item, so this keeps the discount in line with the amounts it lowers: a 100%
+                    // discount brings the amount excluding VAT and the VAT to exactly zero.
+                    $share_excluding = Money::multiply($share, ($base_excluding[$rate] ?? 0) / $base_including[$rate]);
                     $discount_excluding_cents += $share_excluding;
                     $vat_cents[$rate] = ($vat_cents[$rate] ?? 0) + $share - $share_excluding;
                     $rate_including_cents[$rate] = ($rate_including_cents[$rate] ?? 0) + $share;
+                    $rate_excluding_cents[$rate] = ($rate_excluding_cents[$rate] ?? 0) + $share_excluding;
+                    $vat_shares[$rate] = [
+                        'including' => Money::fromCents($share),
+                        'excluding' => Money::fromCents($share_excluding),
+                        'vat' => Money::fromCents($share - $share_excluding),
+                    ];
                 }
                 if (!$shares) {
                     // Nothing to spread over (empty cart), treat the discount as VAT free
@@ -345,6 +361,8 @@ class CartController extends Controller
                         'price_including_vat' => $discountAmount,
                         'price_excluding_vat' => Money::fromCents($discount_excluding_cents),
                         'price_vat' => Money::fromCents($discount_cents - $discount_excluding_cents),
+                        // The discount per VAT rate, so the VAT per rate can be derived from the order afterwards
+                        'vat_shares' => $vat_shares,
                     ],
                     'quantity' => 1,
                 ];

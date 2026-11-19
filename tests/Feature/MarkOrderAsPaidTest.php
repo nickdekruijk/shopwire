@@ -95,3 +95,25 @@ it('marks the order as paid on the verify redirect', function () {
     expect($order->fresh()->paid)->toBeTrue();
     Event::assertDispatchedTimes(OrderPaid::class, 1);
 });
+
+it('still sends the owner mail when the customer mail fails', function () {
+    config(['shopwire.mailable_customer' => ThrowingMailable::class]);
+    $order = makeOrder();
+
+    $this->post('/shopwire/payment/webhook', ['id' => $order->payment_id])->assertOk();
+
+    Mail::assertSent(OrderCreated::class, 1);
+    Mail::assertSentCount(1);
+    Event::assertDispatchedTimes(OrderPaid::class, 1);
+});
+
+it('still sends the customer mail when the owner mail fails', function () {
+    config(['shopwire.mailable_owner' => ThrowingMailable::class]);
+    $order = makeOrder();
+
+    $this->post('/shopwire/payment/webhook', ['id' => $order->payment_id])->assertOk();
+
+    Mail::assertSent(OrderConfirmation::class, 1);
+    Mail::assertSentCount(1);
+    Event::assertDispatchedTimes(OrderPaid::class, 1);
+});
