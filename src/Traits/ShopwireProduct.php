@@ -3,6 +3,7 @@
 namespace NickDeKruijk\Shopwire\Traits;
 
 use NickDeKruijk\Shopwire\Models\Vat;
+use NickDeKruijk\Shopwire\Support\Money;
 
 trait ShopwireProduct
 {
@@ -32,15 +33,21 @@ trait ShopwireProduct
         $price['vat_included'] = $this->shopwire_vat->included;
         $price['vat_rate'] = $this->shopwire_vat->rate;
 
+        // Calculate in whole cents to avoid floating point rounding errors
+        $cents = Money::toCents($price['price']);
+
         if ($price['vat_included']) {
+            $including = $cents;
+            $excluding = Money::excludingVat($cents, $price['vat_rate']);
             $price['price_including_vat'] = $price['price'];
-            $price['price_excluding_vat'] = round($price['price'] / ($price['vat_rate'] / 100 + 1), 2);
-            $price['price_vat'] = $price['price_including_vat'] - $price['price_excluding_vat'];
+            $price['price_excluding_vat'] = Money::fromCents($excluding);
         } else {
-            $price['price_including_vat'] = round($price['price'] * ($price['vat_rate'] / 100 + 1), 2);
+            $including = Money::includingVat($cents, $price['vat_rate']);
+            $excluding = $cents;
+            $price['price_including_vat'] = Money::fromCents($including);
             $price['price_excluding_vat'] = $price['price'];
-            $price['price_vat'] = $price['price_including_vat'] - $price['price_excluding_vat'];
         }
+        $price['price_vat'] = Money::fromCents($including - $excluding);
 
         return (object) $price;
     }

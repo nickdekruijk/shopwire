@@ -5,6 +5,7 @@ namespace NickDeKruijk\Shopwire\Models;
 use Countries;
 use Illuminate\Database\Eloquent\Model;
 use NickDeKruijk\Shopwire\Shopwire;
+use NickDeKruijk\Shopwire\Support\Money;
 
 class Order extends Model
 {
@@ -77,18 +78,19 @@ class Order extends Model
     {
         $vat = 0;
         foreach ($this->products as $product) {
-            $vat += ($product['price']['price_including_vat'] - $product['price']['price_excluding_vat']) * $product['quantity'];
+            $vat += Money::multiply(Money::toCents($product['price']['price_including_vat']), $product['quantity'])
+                - Money::multiply(Money::toCents($product['price']['price_excluding_vat']), $product['quantity']);
         }
-        return $value ?: $vat;
+        return $value ?: Money::fromCents($vat);
     }
 
     public function getAmountExclVatAttribute($value)
     {
-        $vat = 0;
+        $amount = 0;
         foreach ($this->products as $product) {
-            $vat += $product['price']['price_excluding_vat'] * $product['quantity'];
+            $amount += Money::multiply(Money::toCents($product['price']['price_excluding_vat']), $product['quantity']);
         }
-        return $value ?: $vat;
+        return $value ?: Money::fromCents($amount);
     }
 
     public function getCustomerSortedAttribute($value)
