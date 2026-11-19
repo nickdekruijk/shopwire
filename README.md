@@ -144,8 +144,8 @@ Dutch VAT
 Dutch Shipment methods
 `php artisan db:seed --class=NickDeKruijk\\Shopwire\\Seeds\\ShippingDutch`
 
-<!-- Dutch Discounts
-`php artisan db:seed --class=NickDeKruijk\\Shopwire\\Seeds\\DiscountsDutch` -->
+Dutch example discounts, all inactive. Existing discounts are left alone
+`php artisan db:seed --class=NickDeKruijk\\Shopwire\\Seeds\\DiscountsDutch`
 
 ## License
 Shopwire is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
