@@ -60,6 +60,20 @@ abstract class TestCase extends Orchestra
             $table->decimal('price', 8, 2)->default(0);
             $table->unsignedBigInteger('vat_id')->nullable();
             $table->decimal('stock', 8, 2)->nullable();
+            $table->decimal('weight', 8, 2)->nullable();
+            $table->timestamps();
+        });
+
+        Schema::create('product_options', function (Blueprint $table) {
+            $table->id();
+            $table->boolean('active')->default(1);
+            $table->unsignedBigInteger('product_id');
+            $table->string('title')->nullable();
+            $table->string('description')->nullable();
+            $table->decimal('price', 8, 2)->nullable();
+            $table->decimal('stock', 8, 2)->nullable();
+            $table->decimal('weight', 8, 2)->nullable();
+            $table->unsignedBigInteger('sort')->nullable();
             $table->timestamps();
         });
     }

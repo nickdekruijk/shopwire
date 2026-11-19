@@ -96,14 +96,54 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | product_option_model
+    |--------------------------------------------------------------------------
+    | The model to use for product options, also known as variants: for
+    | example the sizes of a shirt, each with its own stock and optionally its
+    | own price. Leave set to null when products have no options.
+    */
+    'product_option_model' => null,
+
+    /*
+    |--------------------------------------------------------------------------
+    | product_option_columns
+    |--------------------------------------------------------------------------
+    | Product option columns used for checkout. Set a column to null when the
+    | options table does not have it. Only used when product_option_model is set.
+    */
+    'product_option_columns' => [
+        'product_id' => 'product_id',   // The product the option belongs to
+        'title' => 'title',             // Added to the product title: "Product (Option)"
+        'description' => 'description',
+        'price' => 'price',             // Overrides the product price, the product price is used when empty
+        'stock' => 'stock',             // Set to null to keep the stock on the product instead of on each option
+        'weight' => 'weight',           // Weight in grams, the product weight is used when empty
+        'active' => 'active',           // Only active options can be added to the cart
+        'sort' => 'sort',               // Order of the options in the add to cart component
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | decrease_stock
     |--------------------------------------------------------------------------
     | When enabled the stock column of each ordered product is decreased once
-    | the order is paid. Products with a null stock value are treated as
-    | unlimited and left untouched. Stock is not checked during checkout, so
-    | it can become negative when more is sold than is available.
+    | the order is paid. For a product option with its own stock column the
+    | stock of the option is decreased instead. A null stock value is treated
+    | as unlimited and left untouched.
     */
     'decrease_stock' => false,
+
+    /*
+    |--------------------------------------------------------------------------
+    | prevent_oversell
+    |--------------------------------------------------------------------------
+    | When enabled a customer can't put more of a product (or product option)
+    | in the cart than is in stock, and the stock is checked again when the
+    | customer goes to the payment. A null stock value is treated as unlimited.
+    | Stock is not reserved: two customers paying at the same time can still
+    | buy the last one, so the stock can become negative.
+    */
+    'prevent_oversell' => false,
 
     /*
     |--------------------------------------------------------------------------

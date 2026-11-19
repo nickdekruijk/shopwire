@@ -63,9 +63,62 @@ You need to make a logging channel called shopwire, add something like this to `
 ```
 
 ## Stock
-Set `decrease_stock` to `true` in the config to decrease the stock column of each ordered product once the order is paid. Products with a `null` stock value are treated as unlimited.
+Set `decrease_stock` to `true` in the config to decrease the stock column of each ordered product once the order is paid. A `null` stock value is treated as unlimited. For a [product variant](#product-variants) with its own stock column the stock of the variant is decreased instead.
 
-Stock is not checked during checkout, so it can become negative when more is sold than is available. Decreasing the stock of a product option is prepared in `Order::decreaseStock()` but not active yet: the cart does not pass a product option to the order.
+Set `prevent_oversell` to `true` to stop customers from putting more in the cart than is in stock. The quantity is limited to the stock and the customer gets a message, in the add to cart component and in the checkout. The stock is checked again when the customer goes to the payment. Stock is not reserved: two customers paying at the same time can still buy the last one, so the stock can become negative.
+
+## Product variants
+Products can have options, also known as variants: for example the sizes of a shirt, each with its own stock and optionally its own price and weight. Without `product_option_model` in the config nothing changes.
+
+Create a model and a table for the options. There is an example model and migration in `src/examples`:
+```php
+Schema::create('product_options', function (Blueprint $table) {
+    $table->id();
+    $table->boolean('active')->default(1)->index();
+    $table->foreignId('product_id')->constrained('products')->onDelete('cascade');
+    $table->string('title')->nullable();
+    $table->string('description')->nullable();
+    $table->decimal('price', 10, 2)->nullable()->index();
+    $table->decimal('stock', 8, 2)->nullable();
+    $table->decimal('weight', 8, 2)->nullable();
+    $table->bigInteger('sort')->nullable()->unsigned()->index();
+    $table->timestamps();
+});
+```
+
+Then set the model in `config/shopwire.php`. Set a column to `null` when your table does not have it:
+```php
+'product_option_model' => App\Models\ProductOption::class,
+'product_option_columns' => [
+    'product_id' => 'product_id',
+    'title' => 'title',
+    'description' => 'description',
+    'price' => 'price',
+    'stock' => 'stock',
+    'weight' => 'weight',
+    'active' => 'active',
+    'sort' => 'sort',
+],
+```
+
+The add to cart component shows a select with the active variants of the product, and a variant must be chosen before the product can be added. To show the component for one variant, pass it in:
+```blade
+{{-- The customer chooses a variant --}}
+<livewire:shopwire-add :product="$product" />
+
+{{-- One fixed variant, a model or an id --}}
+<livewire:shopwire-add :product="$product" :option="$option" />
+```
+
+How variants work:
+- The title in the cart, the order and the mails is the product title followed by the variant title: `Shirt (L)`.
+- The price and weight of the variant are used. When they are empty the price and weight of the product are used.
+- Two variants of the same product are separate items in the cart. The order line stores the variant in `product_option_id`.
+- A variant can only be added when it belongs to the product and is active. `CartController::add()` and `update()` return `false` otherwise.
+- With `product_option_columns.stock` set, each variant has its own stock for `decrease_stock` and `prevent_oversell`. Set it to `null` to keep one stock on the product, shared by its variants.
+- In the checkout component an item without a variant keeps the product id as key in `$items` and `$quantity`. An item with a variant gets the key `{product id}-{variant id}`, for example `12-5`. Each item also has a `cart_item_id`, `product_id` and `product_option_id`.
+
+If you published the views, compare `add-to-cart.blade.php` and `checkout.blade.php` with the package versions: the first has the variant select, both show the stock messages.
 
 ## Events
 Shopwire dispatches these events you can listen to, for example to create invoices or start fulfilment:

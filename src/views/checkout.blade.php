@@ -52,6 +52,17 @@
                     </tr>
                 @endif
             @endforeach
+            @if ($errors->has('quantity.*'))
+                <tr>
+                    <td colspan="4" class="shopwire-checkout-stock">
+                        @foreach ($errors->get('quantity.*') as $messages)
+                            @foreach ($messages as $message)
+                                <span class="shopwire-checkout-form-error">{{ $message }}</span>
+                            @endforeach
+                        @endforeach
+                    </td>
+                </tr>
+            @endif
             @if ($includingVat)
                 <tr>
                     <td colspan="3" class="shopwire-checkout-subtotal">@lang('shopwire::cart.total_to_pay')</td>
