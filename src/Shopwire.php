@@ -4,6 +4,7 @@ namespace NickDeKruijk\Shopwire;
 
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Auth\StatefulGuard;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use NickDeKruijk\Shopwire\Controllers\CartController;
@@ -99,6 +100,45 @@ class Shopwire
         Shopwire::log('notice', 'New order: ' . $order->id);
         self::session(['order_id' => $order->id]);
         return $order;
+    }
+
+    /**
+     * Return the active options of a product, in the configured order. Empty
+     * when product options aren't configured.
+     *
+     * @param  mixed $product The product model or its id
+     * @return Collection
+     */
+    public static function productOptions($product): Collection
+    {
+        $model = config('shopwire.product_option_model');
+        $columns = config('shopwire.product_option_columns');
+        if (!$model || empty($columns['product_id'])) {
+            return collect();
+        }
+
+        $query = (new $model)->newQuery()->where($columns['product_id'], is_object($product) ? $product->getKey() : $product);
+        if (!empty($columns['active'])) {
+            $query->where($columns['active'], true);
+        }
+        if (!empty($columns['sort'])) {
+            $query->orderBy($columns['sort']);
+        }
+
+        return $query->orderBy((new $model)->getKeyName())->get();
+    }
+
+    /**
+     * Return the message to show when a quantity was limited to the stock.
+     *
+     * @param  float|null $available What is left in stock
+     * @return string
+     */
+    public static function stockMessage(?float $available): string
+    {
+        return $available > 0
+            ? __('shopwire::cart.stock_limited', ['stock' => $available + 0])
+            : __('shopwire::cart.out_of_stock');
     }
 
     /**

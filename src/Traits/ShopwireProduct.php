@@ -14,21 +14,29 @@ trait ShopwireProduct
 
     public function getShopwirePriceTaxFreeAttribute()
     {
-        $price = $this->shopwire_price;
-        $price->vat_included = false;
-        $price->vat_rate = 0;
-        $price->price_including_vat = $price->price_excluding_vat;
-        $price->price_vat = 0;
-        return $price;
+        return $this->shopwirePrice($this->shopwireOwnOption(), true);
     }
 
     public function getShopwirePriceAttribute()
     {
-        if (config('shopwire.product_option_model') && $this->option && config('shopwire.product_option_columns.price')) {
-            $price = ['price' => $this->option[config('shopwire.product_option_columns.price')] ?: $this[config('shopwire.product_columns.price')]];
-        } else {
-            $price = ['price' => $this[config('shopwire.product_columns.price')]];
-        }
+        return $this->shopwirePrice($this->shopwireOwnOption());
+    }
+
+    /**
+     * Return the price details of this product, or of one of its options.
+     *
+     * The option is passed in instead of read from the product, because cart
+     * items of the same product share one product instance: an option stored
+     * on the product would leak from one cart item to the next.
+     *
+     * @param  mixed $option The product option, its price is used when it has one
+     * @param  boolean $taxfree Return the price without VAT, for taxfree countries
+     * @return object
+     */
+    public function shopwirePrice($option = null, bool $taxfree = false): object
+    {
+        $option_price = config('shopwire.product_option_columns.price');
+        $price = ['price' => ($option && $option_price ? $option[$option_price] : null) ?: $this[config('shopwire.product_columns.price')]];
 
         $price['vat_included'] = $this->shopwire_vat->included;
         $price['vat_rate'] = $this->shopwire_vat->rate;
@@ -49,6 +57,26 @@ trait ShopwireProduct
         }
         $price['price_vat'] = Money::fromCents($including - $excluding);
 
+        if ($taxfree) {
+            $price['vat_included'] = false;
+            $price['vat_rate'] = 0;
+            $price['price_including_vat'] = $price['price_excluding_vat'];
+            $price['price_vat'] = 0;
+        }
+
         return (object) $price;
+    }
+
+    /**
+     * Older integrations put the chosen option on the product itself, as an
+     * option attribute or relation. Keep using it for shopwire_price.
+     */
+    private function shopwireOwnOption()
+    {
+        if (!config('shopwire.product_option_model')) {
+            return null;
+        }
+
+        return $this->isRelation('option') || $this->hasAttribute('option') ? $this->option : null;
     }
 }

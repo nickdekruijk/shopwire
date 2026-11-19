@@ -9,6 +9,7 @@ use NickDeKruijk\Shopwire\Models\Discount;
 use NickDeKruijk\Shopwire\Models\ShippingRate;
 use NickDeKruijk\Shopwire\Shopwire;
 use NickDeKruijk\Shopwire\Support\Money;
+use NickDeKruijk\Shopwire\Support\Stock;
 use Stevebauman\Location\Facades\Location;
 
 class CartController extends Controller
@@ -107,7 +108,7 @@ class CartController extends Controller
      * @param  integer $product_id
      * @param  float $quantity
      * @param  integer $product_option_id
-     * @return Response
+     * @return boolean See add()
      */
     public static function update($product_id, $quantity = 1, $product_option_id = null)
     {
@@ -121,31 +122,80 @@ class CartController extends Controller
      * @param  float $quantity
      * @param  integer $product_option_id
      * @param  bool $incremental When true, increment the quantity of the item if it already exists in the cart, else set fixed quantity
-     * @return Response
+     * @return boolean False when the product option is invalid (nothing is stored), or when prevent_oversell
+     *                 is enabled and the quantity was limited to the stock (the limited quantity is stored)
      */
     public static function add($product_id, $quantity = 1, $product_option_id = null, $incremental = true)
     {
+        // A product option must belong to the product and be active
+        if (!self::validOption($product_id, $product_option_id)) {
+            return false;
+        }
+
         // Get the current cart, create if needed
         $cart = self::getCart(true);
 
         // Check if product is already in cart
         $cart_item = $cart->items()->where('product_id', $product_id)->where('product_option_id', $product_option_id)->first();
-        if ($cart_item) {
+        if ($cart_item && $incremental) {
             // Already in cart, increase quantity
-            $cart_item->quantity = $incremental ? $cart_item->quantity + $quantity : $quantity;
-        } else {
+            $quantity = $cart_item->quantity + $quantity;
+        }
+
+        // Don't put more in the cart than there is in stock
+        $limited = false;
+        if (config('shopwire.prevent_oversell')) {
+            $available = Stock::available($product_id, $product_option_id, $cart);
+            if ($available !== null && $quantity > $available) {
+                $quantity = $available;
+                $limited = true;
+            }
+        }
+
+        if (!$cart_item) {
+            if ($limited && $quantity <= 0) {
+                // Out of stock, don't add an empty item
+                return false;
+            }
+
             // Create a new one instead
             $cart_item = new CartItem;
             $cart_item->cart_id = $cart->id;
             $cart_item->product_id = $product_id;
             $cart_item->product_option_id = $product_option_id;
-            $cart_item->quantity = $quantity;
         }
 
         // Save it
+        $cart_item->quantity = $quantity;
         $cart_item->save();
 
-        return true;
+        return !$limited;
+    }
+
+    /**
+     * Check if a product option can be added to the cart: it must belong to
+     * the product and be active. Always true when no option is given or when
+     * product options aren't configured.
+     *
+     * @param  integer $product_id
+     * @param  integer $product_option_id
+     * @return boolean
+     */
+    public static function validOption($product_id, $product_option_id): bool
+    {
+        $model = config('shopwire.product_option_model');
+        if (!$product_option_id || !$model) {
+            return true;
+        }
+
+        $option = (new $model)->find($product_option_id);
+        $product_column = config('shopwire.product_option_columns.product_id');
+        $active_column = config('shopwire.product_option_columns.active');
+
+        return $option
+            && $product_column
+            && $option[$product_column] == $product_id
+            && (!$active_column || $option[$active_column]);
     }
 
     public static function taxfree($country_code)
@@ -195,18 +245,22 @@ class CartController extends Controller
 
         // Eager load these relationships
         $with = ['product', 'product.shopwire_vat'];
+        if (config('shopwire.product_option_model')) {
+            $with[] = 'option';
+        }
 
         // Walk thru all items in the cart and calculate VAT
         foreach ($cart->items()->with($with)->get() as $item) {
-            // Get price details and vat rates
-            $price = self::taxfree($cart->country_code) ? $item->product->shopwire_price_taxfree : $item->product->shopwire_price;
+            // Get price details and vat rates, of the product option when the item has one
+            $price = $item->price(self::taxfree($cart->country_code));
 
             $response->items[] = (object) [
                 'id' => $item->id,
                 'product_id' => $item->product_id,
-                'title' => $item->product->title,
+                'product_option_id' => $item->product_option_id,
+                'title' => $item->title,
                 'price' => $price,
-                'weight' => $item->product->weight,
+                'weight' => $item->weight,
                 'product' => $item->product,
                 'quantity' => +$item->quantity,
             ];
@@ -222,7 +276,7 @@ class CartController extends Controller
             if ($item->quantity > 0 && $price->vat_rate > $max_vat_rate) {
                 $max_vat_rate = $price->vat_rate;
             }
-            $response->statistics['weight'] += $item->product->weight * $item->quantity;;
+            $response->statistics['weight'] += $item->weight * $item->quantity;
 
             $response->statistics['count'] += $item->quantity;
             $response->statistics['count_unique']++;

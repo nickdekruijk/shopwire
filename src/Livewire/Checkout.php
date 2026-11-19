@@ -12,6 +12,7 @@ use NickDeKruijk\Shopwire\Events\PaymentCreated;
 use NickDeKruijk\Shopwire\Models\OrderLine;
 use NickDeKruijk\Shopwire\Rules\DiscountCodeValid;
 use NickDeKruijk\Shopwire\Shopwire;
+use NickDeKruijk\Shopwire\Support\Stock;
 
 class Checkout extends Component
 {
@@ -132,9 +133,13 @@ class Checkout extends Component
                     'price' => 0,
                 ];
             } elseif ($this->show_zero || $item->quantity != 0) {
-                $this->quantity[$item->product_id] = $item->quantity;
+                $key = $this->itemKey($item);
+                $this->quantity[$key] = $item->quantity;
                 $this->items[] = [
-                    'id' => $item->product_id,
+                    'id' => $key,
+                    'cart_item_id' => $item->id,
+                    'product_id' => $item->product_id,
+                    'product_option_id' => $item->product_option_id ?? null,
                     'title' => $item->title,
                     'type' => $item->type ?? null,
                     'url' => $item->product_id > 0 ? $item->product->url : null,
@@ -187,13 +192,61 @@ class Checkout extends Component
         }
     }
 
-    public function updatedQuantity($quantity, $product_id)
+    /**
+     * The key of an item in $items and $quantity. This is the product id, as
+     * it always was. An item with a product option gets the option id added
+     * ("12-5"), so two options of the same product don't share a key.
+     */
+    private function itemKey($item)
+    {
+        return config('shopwire.product_option_model') && !empty($item->product_option_id)
+            ? $item->product_id . '-' . $item->product_option_id
+            : $item->product_id;
+    }
+
+    public function updatedQuantity($quantity, $key)
     {
         if ($quantity < 0) {
             $quantity = 0;
         }
-        CartController::update($product_id, $quantity);
+        [$product_id, $product_option_id] = array_pad(explode('-', (string) $key, 2), 2, null);
+        if (!CartController::update($product_id, $quantity, $product_option_id)) {
+            // The quantity was limited to the stock, tell the customer and show what is in the cart now
+            $title = collect($this->items)->firstWhere('id', $key)['title'] ?? '';
+            $this->addError('quantity.' . $key, $title . ': ' . Shopwire::stockMessage(Stock::available($product_id, $product_option_id, CartController::getCart())));
+            $this->cartUpdate();
+        }
         $this->dispatch('cartUpdate');
+    }
+
+    /**
+     * Check the stock of all items once more before going to the payment,
+     * it may have changed since the items were added to the cart. Items that
+     * exceed the stock are limited to it and reported to the customer.
+     */
+    private function stockAvailable(): bool
+    {
+        if (!config('shopwire.prevent_oversell')) {
+            return true;
+        }
+
+        $cart = CartController::getCart();
+        $available = true;
+        foreach ($cart ? $cart->items()->get() : [] as $item) {
+            $stock = Stock::available($item->product_id, $item->product_option_id, $cart);
+            if ($stock !== null && $item->quantity > $stock) {
+                $item->quantity = $stock;
+                $item->save();
+                $this->addError('quantity.' . $this->itemKey($item), $item->title . ': ' . Shopwire::stockMessage($stock));
+                $available = false;
+            }
+        }
+
+        if (!$available) {
+            $this->cartUpdate();
+        }
+
+        return $available;
     }
 
     public function updatedFormDiscountCode($discount_code)
@@ -299,6 +352,11 @@ class Checkout extends Component
 
         // Validate all input
         $this->validate();
+
+        // Don't sell more than there is in stock
+        if (!$this->stockAvailable()) {
+            return false;
+        }
 
         // Attempt to login if not loggedin yet
         if ($this->account == 'login' && Shopwire::auth()->guest()) {

@@ -53,4 +53,8 @@ return [
     'vatExcl' => 'Exclusief BTW',
     'vat_toggle' => 'Toon inclusief BTW',
     'webshop_order' => 'Webshop bestelling #',
+    'option' => 'Variant',
+    'select_option' => 'Kies een variant',
+    'stock_limited' => 'Er is nog maar :stock op voorraad.',
+    'out_of_stock' => 'Uitverkocht',
 ];
