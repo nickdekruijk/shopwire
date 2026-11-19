@@ -27,6 +27,7 @@ abstract class TestCase extends Orchestra
     protected function defineEnvironment($app)
     {
         $app['config']->set('app.debug', true);
+        $app['config']->set('app.key', 'base64:' . base64_encode(str_repeat('a', 32)));
         $app['config']->set('database.default', 'testing');
         $app['config']->set('logging.channels.shopwire', [
             'driver' => 'monolog',

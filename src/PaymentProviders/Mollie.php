@@ -4,6 +4,7 @@ namespace NickDeKruijk\Shopwire\PaymentProviders;
 
 use NickDeKruijk\Shopwire\Resources\Payment;
 use NickDeKruijk\Shopwire\Resources\PaymentProvider;
+use NickDeKruijk\Shopwire\Support\Money;
 
 class Mollie extends PaymentProvider
 {
@@ -52,7 +53,8 @@ class Mollie extends PaymentProvider
         $payment = \Mollie\Laravel\Facades\Mollie::api()->payments->create([
             'amount' => [
                 'currency' => $options['currency'],
-                'value' => $options['amount'],
+                // Mollie requires a string with exactly two decimals
+                'value' => number_format(Money::fromCents(Money::toCents($options['amount'])), 2, '.', ''),
             ],
             'description' => $options['description'],
             'webhookUrl' => $options['webhookUrl'],
