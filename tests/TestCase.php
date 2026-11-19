@@ -1,0 +1,50 @@
+<?php
+
+namespace NickDeKruijk\Shopwire\Tests;
+
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Schema;
+use Livewire\LivewireServiceProvider;
+use Monolog\Handler\NullHandler;
+use NickDeKruijk\Shopwire\ShopwireServiceProvider;
+use NickDeKruijk\Shopwire\Tests\Fixtures\FakePaymentProvider;
+use NickDeKruijk\Shopwire\Tests\Fixtures\Product;
+use Orchestra\Testbench\TestCase as Orchestra;
+
+abstract class TestCase extends Orchestra
+{
+    use RefreshDatabase;
+
+    protected function getPackageProviders($app)
+    {
+        return [
+            LivewireServiceProvider::class,
+            ShopwireServiceProvider::class,
+        ];
+    }
+
+    protected function defineEnvironment($app)
+    {
+        $app['config']->set('app.debug', true);
+        $app['config']->set('database.default', 'testing');
+        $app['config']->set('logging.channels.shopwire', [
+            'driver' => 'monolog',
+            'handler' => NullHandler::class,
+        ]);
+        $app['config']->set('shopwire.product_model', Product::class);
+        $app['config']->set('shopwire.payment_provider', FakePaymentProvider::class);
+    }
+
+    protected function defineDatabaseMigrations()
+    {
+        Schema::create('products', function (Blueprint $table) {
+            $table->id();
+            $table->string('title');
+            $table->decimal('price', 8, 2)->default(0);
+            $table->unsignedBigInteger('vat_id')->nullable();
+            $table->decimal('stock', 8, 2)->nullable();
+            $table->timestamps();
+        });
+    }
+}

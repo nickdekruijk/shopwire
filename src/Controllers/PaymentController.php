@@ -6,10 +6,12 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use NickDeKruijk\Shopwire\Controllers\CartController;
+use NickDeKruijk\Shopwire\Events\OrderPaid;
 use NickDeKruijk\Shopwire\Models\Order;
 use NickDeKruijk\Shopwire\Resources\Payment;
 use NickDeKruijk\Shopwire\Resources\PaymentProvider;
 use NickDeKruijk\Shopwire\Shopwire;
+use Throwable;
 
 class PaymentController extends Controller
 {
@@ -64,14 +66,36 @@ class PaymentController extends Controller
      */
     private function markOrderAsPaid(Order $order)
     {
-        if (!$order->paid) {
-            Shopwire::log('info', 'Verified payment: ' . $order->payment_id);
+        // Atomically flag the order as paid. The verify redirect and the webhook
+        // can arrive at the same time; only the request that actually flips the
+        // flag continues, so mails, stock and events are handled exactly once.
+        $updated = $order->newQuery()
+            ->whereKey($order->getKey())
+            ->where('paid', false)
+            ->update(['paid' => true]);
+
+        if (!$updated) {
+            return;
+        }
+
+        $order->refresh();
+        Shopwire::log('info', 'Verified payment: ' . $order->payment_id);
+
+        if (config('shopwire.decrease_stock')) {
+            $order->decreaseStock();
+        }
+
+        // A failing mail must not undo or block the paid status
+        try {
             Mail::send((new (config('shopwire.mailable_customer'))($order)));
             Mail::send((new (config('shopwire.mailable_owner'))($order)));
             Shopwire::log('info', 'Mails sent: ' . $order->customer['email']);
-            $order->paid = true;
-            $order->save();
+        } catch (Throwable $e) {
+            report($e);
+            Shopwire::log('error', 'Sending order mails failed for order ' . $order->id . ': ' . $e->getMessage());
         }
+
+        event(new OrderPaid($order));
     }
 
     /**
